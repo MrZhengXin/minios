@@ -1,0 +1,13 @@
+{
+    "name": "f7",
+    "type": "crwx",
+    "size": "233",
+	"priority": 2,
+    "content": [
+        "fork 0",
+		"cpu 1",
+        "fork 0",
+		"printer 1",
+		"cpu 1"
+    ]
+}
