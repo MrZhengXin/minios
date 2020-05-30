@@ -425,12 +425,12 @@ class FileManager:
                     basename +
                     "': No such file")
 
-    # 输出当前工作路径,-r表示不输出, 仅返回
-    def pwd(self, mode=''):
-        if mode == '-r':
-            return self.current_working_path
-        else:
-            print(self.current_working_path)
+    # # 输出当前工作路径,-r表示不输出, 仅返回
+    # def pwd(self, mode=''):
+    #     if mode == '-r':
+    #         return self.current_working_path
+    #     else:
+    #         print(self.current_working_path)
 
     # 仅做调试用, 将文件树很好看地打印出来
     def tree_dir(self, dir=root_path, layer=0):
