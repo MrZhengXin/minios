@@ -104,51 +104,51 @@ class MemoryManager:
     # using best fit algorithm
     def continue_free(self, pid, aid):
         status = 0  # if the pid with aid were found in memory
+        delete = []
         for i in range(len(self.r)):
-            if self.r[i][-1] == aid and self.r[i][-2] == pid:
+            if (self.r[i][-1] == aid or aid==None) and self.r[i][-2] == pid:
                 base_address = self.r[i][0]
                 size = self.r[i][1]
                 self.allocated -= size
-                self.r.pop(i)
+                delete.append(i)
                 status = 1
-                break
-        if status == 1:
-            '''base_meet: if the start address of the new free memory meet with the end of a hole
-                            base_meet = the index of the hole
-                end_meet: if the end address of the new free memory meet with the start of a hole
-                          end_meet = the index of the hole
-            '''
-            base_meet = -1
-            end_meet = -1
-            for i in range(len(self.hole)):
-                if self.hole[i][0] + self.hole[i][1] == base_address:
-                    base_meet = i
-                elif self.hole[i][0] == base_address + size:
-                    end_meet = i
-            # the new free in between of two hole
-            if base_meet != -1 and end_meet != -1:
-                self.hole[base_meet][1] += size + self.hole[end_meet][1]
-                self.hole.pop(end_meet)
-            # the new free after a hole
-            elif base_meet != -1:
-                self.hole[base_meet][1] += size
-            # the new free before a hole
-            elif end_meet != -1:
-                self.hole[end_meet][1] += size
-                self.hole[end_meet][0] = base_address
-            else:
-                self.hole.append([base_address, size])
-            return True
-        # cannot find the record
-        else:
+                '''base_meet: if the start address of the new free memory meet with the end of a hole
+                                            base_meet = the index of the hole
+                                end_meet: if the end address of the new free memory meet with the start of a hole
+                                          end_meet = the index of the hole
+                            '''
+                base_meet = -1
+                end_meet = -1
+                for i in range(len(self.hole)):
+                    if self.hole[i][0] + self.hole[i][1] == base_address:
+                        base_meet = i
+                    elif self.hole[i][0] == base_address + size:
+                        end_meet = i
+                # the new free in between of two hole
+                if base_meet != -1 and end_meet != -1:
+                    self.hole[base_meet][1] += size + self.hole[end_meet][1]
+                    self.hole.pop(end_meet)
+                # the new free after a hole
+                elif base_meet != -1:
+                    self.hole[base_meet][1] += size
+                # the new free before a hole
+                elif end_meet != -1:
+                    self.hole[end_meet][1] += size
+                    self.hole[end_meet][0] = base_address
+                else:
+                    self.hole.append([base_address, size])
+        if status != 1:
             print("Error! the memory doesn't exist!")
             return False
+        for i in range(len(delete)-1, -1, -1):
+            self.r.pop(delete[i])
+        return True
 
     # find the aiming page and delete it from page table
     def page_free(self, pid, aid):
         status = 0
         for i in range(self.pn):
-            if self.record[i][1] == pid and self.record[i][2] == aid:
+            if self.record[i][1] == pid and (self.record[i][2] == aid or aid ==None):
                 status = 1
                 self.allocated -= self.record[i][0]
                 self.record[i][0] = self.ps
@@ -160,32 +160,35 @@ class MemoryManager:
         return True
 
     def page_show(self):
-        print(f'total: {self.total:.0f}B allocated: {self.allocated:.0f}B free: {self.total - self.allocated:.0f}B')
+        print('total: %-dB allocated: %-dB free: %-dB' % (self.total, self.allocated,
+                                                                       self.total - self.allocated))
         for i in range(self.pn):
-            print(
-                f'# [page #{i:.0f}] {self.record[i][0]:.0f}/{self.ps} Byte(s) pid = {self.record[i][1]} '
-                f'aid = {self.record[i][2]}')
+            if self.record[i][1] != -1 and self.record[i][2] != -1:
+                print(
+                    "# [page # %d}]  %-4d/%-4d Byte(s)  pid =%-3d  aid =%-3d" % (i, self.ps - self.record[i][0], self.ps,
+                                                                                    self.record[i][1], self.record[i][2]))
 
     def continue_show(self):
-        print('total: {:.0f}B allocated: {:.0f}B free: {:.0f}B'.format(self.total, self.allocated,
-                                                                       self.total - self.allocated))
+        print('total: %-dB allocated: %-dB free: %-dB' % (self.total, self.allocated,
+                                                          self.total - self.allocated))
         for i in range(len(self.r)):
-            print('# [base address]: {:#x}, [end address]: {:#x}, pid = {} aid = {}'.format(self.r[i][0],
+            print('# [base address]: 0x%-5x  [end address]: 0x%-5x pid = %-3d aid = %-3d' %(self.r[i][0],
                                                                                             self.r[i][0] + self.r[i][1],
                                                                                             self.r[i][2], self.r[i][3]))
 
 
 if __name__ == '__main__':
-    mm = MemoryManager(mode='p')
+    mm = MemoryManager(mode='cb')
     t = mm.alloc(0, 200)
     mm.display_memory_status()
     mm.alloc(1, 2000)
     mm.display_memory_status()
     t1 = mm.alloc(1, 1094)
     mm.display_memory_status()
-    mm.free(0, t)
+    mm.free(1, None)
     mm.display_memory_status()
-    mm.alloc(2, 120)
+    t2 = mm.alloc(1, 120)
     mm.display_memory_status()
-    mm.free(1, t1)
+    mm.alloc(1, 200)
+    mm.free(1, t2)
     mm.display_memory_status()
