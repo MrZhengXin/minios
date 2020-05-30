@@ -58,10 +58,10 @@ class MemoryManager:
             if self.record[i][1] == -1:  # the page is empty
                 self.record[i][1] = pid
                 if s >= self.ps:
-                    self.record[i][0] -= self.ps
+                    self.record[i][0] = self.ps
                     s -= self.ps
                 else:
-                    self.record[i][0] = self.ps - s
+                    self.record[i][0] = s
                     s -= s
                 self.record[i][2] = aid
             if s == 0:
@@ -165,7 +165,7 @@ class MemoryManager:
         for i in range(self.pn):
             if self.record[i][1] != -1 and self.record[i][2] != -1:
                 print(
-                    "# [page # %d}]  %-4d/%-4d Byte(s)  pid =%-3d  aid =%-3d" % (i, self.ps - self.record[i][0], self.ps,
+                    "block #%d  %-4d/%-4d Byte(s)  pid =%-3d  aid =%-3d" % (i, self.record[i][0], self.ps,
                                                                                     self.record[i][1], self.record[i][2]))
 
     def continue_show(self):
@@ -178,7 +178,7 @@ class MemoryManager:
 
 
 if __name__ == '__main__':
-    mm = MemoryManager(mode='cb')
+    mm = MemoryManager(mode='p')
     t = mm.alloc(0, 200)
     mm.display_memory_status()
     mm.alloc(1, 2000)
