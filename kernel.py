@@ -18,13 +18,12 @@ class Kernel:
                                                  time_slot=1,
                                                  printer_num=1)
 
-        my_process_manager_run_thread = threading.Thread(target=self.my_process_manager.run)
-        my_process_manager_run_thread.start()
-
         self.pid_to_aid = {}
 
-    def report_error(self, cmd, err_content):
-        print('[error %s] %s' % (cmd, err_content))
+    def report_error(self, cmd, err_msg=''):
+        print('[error %s] %s' % (cmd, err_msg))
+        if err_msg == '':
+            self.display_command_description(cmd_list=[cmd])
 
     # command: man [cmd1] [cmd2] ...
     def display_command_description(self, cmd_list):
@@ -32,22 +31,27 @@ class Kernel:
             'man': 'manual page, format: man [command1] [command2] ...',
             'ls': 'list directory contents, format: ls [path]',
             'cd': 'change current working directory, format: cd [path]',
-            'rm': 'remove file or directory recursively, format: rm [path]',
-            'mkdir': 'make directory, format: mkdir [path]',
-            #'mkf': 'make file, format: mkf [path]',
+            'rm': 'remove file or directory recursively, format: rm [-r] path',
+            'mkdir': 'make directory, format: mkdir path',
+            #'mkf': 'make file, format: mkf path',
             'dss': 'display storage status, format: dss',
             'dms': 'display memory status, format: dms',
-            'exec': 'create process, format: exec [path]',
+            'exec': 'create process, format: exec path',
             'ps': 'display process status, format: ps',
             'rs': 'display resource status, format: rs',
-            'kill': 'kill process, format:kill [pid]' 
+            'kill': 'kill process, format: kill pid'
         }
-        if cmd_list is None:
+        if len(cmd_list) == 0:
             cmd_list = command_to_description.keys()
         for cmd in cmd_list:
             print(cmd, '-', command_to_description[cmd])
 
     def run(self):
+
+        # start process manager
+        my_process_manager_run_thread = threading.Thread(target=self.my_process_manager.run)
+        my_process_manager_run_thread.start()
+
         while True:
             # a list of commands split by space
             command_split = self.my_shell.get_split_command(cwd=self.my_file_manager.current_working_path)
@@ -63,10 +67,7 @@ class Kernel:
             if tool == 'space':
                 pass
             elif tool == 'man':
-                if argc >= 2:
-                    self.display_command_description(cmd_list=command_split[1:])
-                else:
-                    self.display_command_description(cmd_list=None)
+                self.display_command_description(cmd_list=command_split[1:])
             elif tool == 'ls':
                 if argc >= 2:
                     self.my_file_manager.ls(dir_path=command_split[1])
@@ -79,16 +80,22 @@ class Kernel:
                     self.my_file_manager.cd(dir_path=os.sep)
             elif tool == 'rm':
                 if argc >= 2:
-                    self.my_file_manager.rm(file_path=command_split[1])
+                    if argc == 2:
+                        self.my_file_manager.rm(file_path=command_split[1])
+                    else:
+                        self.my_file_manager.rm(mode=command_split[1], file_path=command_split[2])
                 else:
-                    self.report_error(cmd='rm',
-                                      err_content='please input path of file or directory to remove, format: rm [path]')
+                    self.report_error(cmd=tool)
+            elif tool == 'chmod':
+                if argc >= 3:
+                    self.my_file_manager.chmod(file_path=command_split[1], file_type=command_split[2])
+                else:
+                    self.report_error(cmd=tool)
             elif tool == 'mkdir':
                 if argc >= 2:
                     self.my_file_manager.mkdir(dir_path=command_split[1])
                 else:
-                    self.report_error(cmd='mkdir',
-                                      err_content='please input path of directory to create, format: mkdir [path]')
+                    self.report_error(cmd=tool)
             elif tool == 'dss':
                 self.my_file_manager.display_storage_status()
             elif tool == 'dms':
@@ -101,20 +108,22 @@ class Kernel:
                         my_aid = self.my_memory_manager.alloc(pid=my_pid, size=int(my_file['size']))
                         self.pid_to_aid[my_pid] = my_aid
                 else:
-                    self.report_error(cmd='exec',
-                                      err_content='please input pid you want to kill, format: kill [pid]')
+                    self.report_error(cmd=tool)
             elif tool == 'ps':
                 self.my_process_manager.process_status()
             elif tool == 'rs':
                 self.my_process_manager.resource_status()
             elif tool == 'kill':
+                pid_to_kill = int(command_split[1])
                 if argc >= 2:
-                    self.my_process_manager.kill_process(int(command_split[1]))
+                    # result of process killing
+                    kill_res = self.my_process_manager.kill_process(pid=pid_to_kill)
+                    if kill_res:
+                        self.my_memory_manager.free(pid=pid_to_kill, aid=self.pid_to_aid[pid_to_kill])
                 else:
-                    self.report_error(cmd='kill',
-                                      err_content='please input path of executive file, format: exec [path]')
+                    self.report_error(cmd=tool)
             else:
-                self.report_error(cmd=command_split[0], err_content='no such command')
+                self.report_error(cmd=tool, err_msg='no such command')
 
 if __name__ == '__main__':
     my_kernel = Kernel()

@@ -2,10 +2,10 @@
     "name": "f1",
     "type": "crwx",
     "size": "233",
-	"priority": 2,
+    "priority": 2,
     "content": [
-		"cpu 5",
-		"printer 10",
-		"cpu 3"
+        "cpu 5",
+        "printer 10",
+        "cpu 3"
     ]
 }
