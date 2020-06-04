@@ -1,3 +1,9 @@
+class MemoryMonitor:
+    def __init__(self, my_memory_manager):
+        self.my_memory_manager = my_memory_manager
+
+
+
 class MemoryManager:
     def __init__(self, mode, page_size=1024, page_number=8):
         """
