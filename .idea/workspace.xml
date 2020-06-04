@@ -3,93 +3,14 @@
   <component name="ChangeListManager">
     <list default="true" id="e84fa581-35f8-455f-b66e-394fae25de3f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MiniOS_files/dir1/dir2/dir3/dir6/f4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/MiniOS_files/dir1/dir2/dir3/f5" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/file_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/file_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kernel.py" beforeDir="false" afterPath="$PROJECT_DIR$/kernel.py" afterDir="false" />
     </list>
-    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/file_manager.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="661">
-              <caret line="426" lean-forward="true" selection-start-line="426" selection-end-line="426" />
-              <folding>
-                <element signature="e#1376#2593#0" />
-                <element signature="e#2689#3542#0" />
-                <element signature="e#3580#3744#0" />
-                <element signature="e#3835#4411#0" />
-                <element signature="e#4482#5146#0" />
-                <element signature="e#5199#5467#0" />
-                <element signature="e#5580#6253#0" />
-                <element signature="e#6335#6770#0" />
-                <element signature="e#7798#9146#0" />
-                <element signature="e#9211#10090#0" />
-                <element signature="e#10199#11652#0" />
-                <element signature="e#11723#14824#0" />
-                <element signature="e#14933#16359#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/shell.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="184">
-              <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/kernel.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="299">
-              <caret line="25" column="25" lean-forward="true" selection-start-line="25" selection-start-column="25" selection-end-line="25" selection-end-column="25" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/config.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="115">
-              <caret line="5" selection-start-line="5" selection-end-line="5" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/memory_manager.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2921">
-              <caret line="173" column="31" selection-start-line="173" selection-start-column="31" selection-end-line="173" selection-end-column="31" />
-              <folding>
-                <element signature="e#2789#3693#0" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/process_manager.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="989">
-              <caret line="48" column="25" selection-start-line="48" selection-start-column="25" selection-end-line="48" selection-end-column="25" />
-              <folding>
-                <element signature="e#15#26#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -98,77 +19,25 @@
       </list>
     </option>
   </component>
-  <component name="FindInProjectRecents">
-    <findStrings>
-      <find>command_splitted</find>
-      <find>get_splitted_command</find>
-      <find>get</find>
-      <find>load_dict</find>
-      <find>fork</find>
-      <find>base_address</find>
-    </findStrings>
-    <replaceStrings>
-      <replace>command_split</replace>
-      <replace>file</replace>
-    </replaceStrings>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="IdeDocumentHistory">
-    <option name="CHANGED_PATHS">
-      <list>
-        <option value="$PROJECT_DIR$/FileManager/external_storage.py" />
-        <option value="$PROJECT_DIR$/MemoryManager/MemoryManager.py" />
-        <option value="$PROJECT_DIR$/FileManager/disk_block.py" />
-        <option value="$PROJECT_DIR$/Disk/block.py" />
-        <option value="$PROJECT_DIR$/Disk/disk.py" />
-        <option value="$PROJECT_DIR$/FileManager/block.py" />
-        <option value="$PROJECT_DIR$/MemoryManager/memory_manager.py" />
-        <option value="$PROJECT_DIR$/FileManager/file_manager.py" />
-        <option value="$PROJECT_DIR$/Device/printer.py" />
-        <option value="$PROJECT_DIR$/ProcessManager/process_manager.py" />
-        <option value="$PROJECT_DIR$/device.py" />
-        <option value="$PROJECT_DIR$/demo.py" />
-        <option value="$PROJECT_DIR$/hardware_resource.py" />
-        <option value="$PROJECT_DIR$/memory_manager.py" />
-        <option value="$PROJECT_DIR$/shell.py" />
-        <option value="$PROJECT_DIR$/start.py" />
-        <option value="$PROJECT_DIR$/config.py" />
-        <option value="$PROJECT_DIR$/process_manager.py" />
-        <option value="$PROJECT_DIR$/file_manager.py" />
-        <option value="$PROJECT_DIR$/kernel.py" />
-      </list>
-    </option>
-  </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1092" />
-    <option name="y" value="147" />
-    <option name="width" value="1939" />
-    <option name="height" value="1050" />
-  </component>
-  <component name="ProjectView">
-    <navigator proportions="" version="1">
-      <foldersAlwaysOnTop value="true" />
-    </navigator>
-    <panes>
-      <pane id="ProjectPane">
-        <subPane>
-          <expand>
-            <path>
-              <item name="minios" type="b2602c69:ProjectViewProjectNode" />
-              <item name="minios" type="462c0819:PsiDirectoryNode" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="Scope" />
-    </panes>
+  <component name="ProjectId" id="1cfaxei7gB9AuH1rqR9VqOC5DEH" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="settings.github" />
@@ -179,18 +48,6 @@
       <recent name="C:\Users\Administrator\Desktop\MiniOS\FileManager" />
       <recent name="C:\Users\Administrator\Desktop\MiniOS\Disk" />
     </key>
-  </component>
-  <component name="RunDashboard">
-    <option name="ruleStates">
-      <list>
-        <RuleState>
-          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
-        </RuleState>
-        <RuleState>
-          <option name="name" value="StatusDashboardGroupingRule" />
-        </RuleState>
-      </list>
-    </option>
   </component>
   <component name="RunManager" selected="Python.kernel">
     <configuration name="demo" type="PythonConfigurationType" factoryName="Python" temporary="true">
@@ -284,11 +141,23 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.kernel" />
-        <item itemvalue="Python.file_manager" />
         <item itemvalue="Python.shell" />
+        <item itemvalue="Python.file_manager" />
         <item itemvalue="Python.demo" />
       </list>
     </recent_temporary>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -311,6 +180,8 @@
       <workItem from="1590761930986" duration="984000" />
       <workItem from="1590809441003" duration="4212000" />
       <workItem from="1590818827730" duration="2444000" />
+      <workItem from="1590922358675" duration="6883000" />
+      <workItem from="1591255896818" duration="934000" />
     </task>
     <task id="LOCAL-00001" summary="modified kernel">
       <created>1590818896394</created>
@@ -350,37 +221,6 @@
     <option name="localTasksCounter" value="6" />
     <servers />
   </component>
-  <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="47524000" />
-  </component>
-  <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1477" height="797" extended-state="6" />
-    <editor active="true" />
-    <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.20084566" />
-      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32882884" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.33533835" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="8" weight="0.44962406" />
-      <window_info anchor="bottom" id="Database Changes" order="9" />
-      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info anchor="bottom" id="Terminal" order="11" weight="0.34285715" />
-      <window_info anchor="bottom" id="Python Console" order="12" weight="0.32932332" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
-      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="right" id="Remote Host" order="3" />
-      <window_info anchor="right" id="SciView" order="4" />
-      <window_info anchor="right" id="Database" order="5" />
-    </layout>
-  </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
@@ -400,20 +240,7 @@
         <entry key="MAIN">
           <value>
             <State>
-              <option name="RECENTLY_FILTERED_USER_GROUPS">
-                <collection />
-              </option>
-              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
-                <collection />
-              </option>
-              <option name="COLUMN_ORDER">
-                <list>
-                  <option value="0" />
-                  <option value="1" />
-                  <option value="2" />
-                  <option value="3" />
-                </list>
-              </option>
+              <option name="COLUMN_ORDER" />
             </State>
           </value>
         </entry>
@@ -424,92 +251,85 @@
     <MESSAGE value="modified kernel" />
     <option name="LAST_COMMIT_MESSAGE" value="modified kernel" />
   </component>
+  <component name="WindowStateProjectService">
+    <state x="295" y="97" key="#Notifications" timestamp="1590922426337">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state x="295" y="97" key="#Notifications/0.0.1536.864@0.0.1536.864" timestamp="1590922426337" />
+    <state width="700" height="466" key="DebuggerActiveHint" timestamp="1590932314935">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state width="700" height="466" key="DebuggerActiveHint/0.0.1536.864@0.0.1536.864" timestamp="1590932314935" />
+    <state width="1493" height="218" key="GridCell.Tab.0.bottom" timestamp="1591256772969">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state width="1493" height="218" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1591256772969" />
+    <state width="1493" height="218" key="GridCell.Tab.0.center" timestamp="1591256772969">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state width="1493" height="218" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1591256772969" />
+    <state width="1493" height="218" key="GridCell.Tab.0.left" timestamp="1591256772969">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state width="1493" height="218" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1591256772969" />
+    <state width="1493" height="218" key="GridCell.Tab.0.right" timestamp="1591256772969">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state width="1493" height="218" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1591256772969" />
+    <state width="1346" height="271" key="GridCell.Tab.1.bottom" timestamp="1591007693585">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state width="1346" height="271" key="GridCell.Tab.1.bottom/0.0.1536.864@0.0.1536.864" timestamp="1591007693585" />
+    <state width="1346" height="271" key="GridCell.Tab.1.center" timestamp="1591007693585">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state width="1346" height="271" key="GridCell.Tab.1.center/0.0.1536.864@0.0.1536.864" timestamp="1591007693585" />
+    <state width="1346" height="271" key="GridCell.Tab.1.left" timestamp="1591007693585">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state width="1346" height="271" key="GridCell.Tab.1.left/0.0.1536.864@0.0.1536.864" timestamp="1591007693585" />
+    <state width="1346" height="271" key="GridCell.Tab.1.right" timestamp="1591007693585">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state width="1346" height="271" key="GridCell.Tab.1.right/0.0.1536.864@0.0.1536.864" timestamp="1591007693585" />
+    <state x="395" y="264" key="com.intellij.ide.util.TipDialog" timestamp="1591255901050">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state x="395" y="264" key="com.intellij.ide.util.TipDialog/0.0.1536.864@0.0.1536.864" timestamp="1591255901050" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/file_manager.py</url>
+          <line>347</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/file_manager.py</url>
+          <line>389</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/file_manager.py</url>
+          <line>392</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/file_manager.py</url>
+          <line>366</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/MiniOS$file_manager.coverage" NAME="file_manager Coverage Results" MODIFIED="1590571929357" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/MiniOS$shell.coverage" NAME="shell Coverage Results" MODIFIED="1590416954691" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/minios$kernel.coverage" NAME="kernel Coverage Results" MODIFIED="1591256772953" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MiniOS$kernel.coverage" NAME="kernel Coverage Results" MODIFIED="1590817394788" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/minios$kernel.coverage" NAME="kernel Coverage Results" MODIFIED="1590822039239" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/MiniOS$shell.coverage" NAME="shell Coverage Results" MODIFIED="1590416954691" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MiniOS$demo.coverage" NAME="demo Coverage Results" MODIFIED="1589983008997" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-  </component>
-  <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/FileManager/external_storage.py" />
-    <entry file="file://$PROJECT_DIR$/Disk/disk.py" />
-    <entry file="file://$PROJECT_DIR$/FileManager/block.py" />
-    <entry file="file://$PROJECT_DIR$/test_file" />
-    <entry file="file://$PROJECT_DIR$/demo.py" />
-    <entry file="file://$PROJECT_DIR$/hardware_resource.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="46">
-          <caret line="3" selection-start-line="3" selection-end-line="3" />
-          <folding>
-            <element signature="e#0#15#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/小示例/demo.py" />
-    <entry file="file://$PROJECT_DIR$/config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="5" selection-start-line="5" selection-end-line="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/process_manager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="989">
-          <caret line="48" column="25" selection-start-line="48" selection-start-column="25" selection-end-line="48" selection-end-column="25" />
-          <folding>
-            <element signature="e#15#26#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/file_manager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="661">
-          <caret line="426" lean-forward="true" selection-start-line="426" selection-end-line="426" />
-          <folding>
-            <element signature="e#1376#2593#0" />
-            <element signature="e#2689#3542#0" />
-            <element signature="e#3580#3744#0" />
-            <element signature="e#3835#4411#0" />
-            <element signature="e#4482#5146#0" />
-            <element signature="e#5199#5467#0" />
-            <element signature="e#5580#6253#0" />
-            <element signature="e#6335#6770#0" />
-            <element signature="e#7798#9146#0" />
-            <element signature="e#9211#10090#0" />
-            <element signature="e#10199#11652#0" />
-            <element signature="e#11723#14824#0" />
-            <element signature="e#14933#16359#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/shell.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/memory_manager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2921">
-          <caret line="173" column="31" selection-start-line="173" selection-start-column="31" selection-end-line="173" selection-end-column="31" />
-          <folding>
-            <element signature="e#2789#3693#0" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/kernel.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
-          <caret line="25" column="25" lean-forward="true" selection-start-line="25" selection-start-column="25" selection-end-line="25" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
+    <SUITE FILE_PATH="coverage/minios$file_manager.coverage" NAME="file_manager Coverage Results" MODIFIED="1591256556603" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/minios$shell.coverage" NAME="shell Coverage Results" MODIFIED="1591256767869" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

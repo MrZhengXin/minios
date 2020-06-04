@@ -1,5 +1,6 @@
 import json
 import os
+import copy
 
 class Block:
     def __init__(self, total_space):
@@ -53,23 +54,25 @@ class FileManager:
         pass
 
     # return file, if failed, report error and return None.
-    # file_path仅支持文件的相对路径(暂不支持绝对路径), mode格式与函数open()约定的相同
+    # file_path支持绝对路径, mode格式与函数open()约定的相同
     def get_file(self, file_path, mode='r'):
         # 由于open()能完成绝大多数工作, 该函数的主要功能体现在排除异常:
-        upper_path = file_path.rsplit(self.file_separator, 1)[0]
-        current_working_dict = self.path2dict(
-            self.current_working_path + upper_path)
+        (upper_path, basename) = self.path_split(file_path)
+        current_working_dict = self.path2dict(upper_path)
         # 异常1.当路径文件夹不存在时, 报错,报错在 path2dict() 中进行
         if current_working_dict == -1:
             pass
         else:
             # 异常2.文件不存在
-            name = file_path.split(self.file_separator)[-1]
-            if name in current_working_dict:
+            if basename in current_working_dict:
                 # 异常3.是文件夹
-                if not isinstance(current_working_dict[name], dict):
-                    # 将相对路径进行转换并传给open
-                    gf_path = self.root_path + self.current_working_path + file_path
+                if not isinstance(current_working_dict[basename], dict):
+                    # 相对路径
+                    if file_path[0] != self.file_separator:
+                        gf_path = self.root_path + self.current_working_path + file_path
+                    # 绝对路径
+                    else:
+                        gf_path = self.root_path + file_path
                     # 未解决异常! 直接把形参mode丢到open()了.
                     f = open(gf_path, mode)
                     print("get_file success")
@@ -77,12 +80,12 @@ class FileManager:
                 else:
                     print(
                         "get_file: cannot get file'" +
-                        name +
+                        basename +
                         "': dir not a common file")
             else:
                 print(
                     "get_file: cannot get file'" +
-                    name +
+                    basename +
                     "': file not exist")
 
         return False
@@ -192,7 +195,7 @@ class FileManager:
         return (upper_path, basename)
 
     # command: ls
-    def ls(self, dir_path=''):  # dir_path为空时,列出当前目录文件; 非空(填相对路径时), 列出目标目录里的文件
+    def ls(self, dir_path='', mode = ''):  # dir_path为空时,列出当前目录文件; 非空(填相对路径时), 列出目标目录里的文件
         current_working_dict = self.path2dict(dir_path)
         # 异常1:ls路径出错. 由于path2dict()中已经报错 | 注: 此处偷懒 如果目标存在, 但不是文件夹, 同样报path
         # error
@@ -200,18 +203,33 @@ class FileManager:
             pass
         else:
             file_list = current_working_dict.keys()
+            # 目录为空时, 直接结束
+            if len(file_list) == 0:
+                return
+            if mode not in ('-a', '-l', '-al', ''):
+                print("ls: invalid option'" + mode + "', try '-a' / '-l' / '-al'")
+                return
             for file in file_list:
                 # 隐藏文件不显示
-                if file[0] == '.':
+                if file[0] == '.' and not mode[0:2] == '-a':
                     pass
                 # 文件夹高亮蓝色显示
                 elif isinstance(current_working_dict[file], dict):
-                    print('\033[1;34m' + file + '\033[0m', '\t', end='')
+                    if mode == '-l' or mode == '-al':
+                        print('d---', '\t', '\033[1;34m' + file + '\033[0m')
+                    else:
+                        print('\033[1;34m' + file + '\033[0m', '\t', end='')
                 # 可执行文件高亮绿色显示
                 elif current_working_dict[file][3] == 'x':
-                    print('\033[1;32m' + file + '\033[0m', '\t', end='')
+                    if mode == '-l' or mode == '-al':
+                        print(current_working_dict[file], '\t', '\033[1;34m' + file + '\033[0m')
+                    else:
+                        print('\033[1;32m' + file + '\033[0m', '\t', end='')
                 else:
-                    print(file, '\t', end='')
+                    if mode == '-l' or mode == '-al':
+                        print(current_working_dict[file], '\t', file)
+                    else:
+                        print(file, '\t', end='')
             print('')
 
     # command: cd
@@ -229,6 +247,9 @@ class FileManager:
             elif dir_path == '..':
                 self.current_working_path = self.current_working_path.rsplit(self.file_separator, 2)[
                     0] + self.file_separator
+            # 参数为"\"(根目录), 由于根目录无上级目录, 无法完成下一个分支中的操作, 故在这个分支中单独操作.
+            elif dir_path == os.sep:
+                self.current_working_path = os.sep
             else:
                 try:
 
@@ -322,8 +343,8 @@ class FileManager:
         if current_working_dict == -1:
             pass
         else:
-            # -r删空文件夹
-            if mode == '-r':
+            # -r 与 -rf 删文件夹
+            if mode[0:2] == '-r':
                 try:
                     # 异常1: 目录不存在
                     if basename in current_working_dict:
@@ -333,10 +354,33 @@ class FileManager:
                         # 绝对路径
                         else:
                             rmdir_path = self.root_path + file_path
-                        # 同时修改文件树
-                        current_working_dict.pop(basename)
-                        os.rmdir(rmdir_path)
-                        print("rm -r success")
+                        # -rf: 递归地强制删除文件夹
+                        if len(mode) == 3 and mode[2] == 'f':
+                            sub_dir_dict = self.path2dict(file_path)
+                            for i in copy.deepcopy(copy.deepcopy(list(sub_dir_dict.keys()))):  # 删除此目录下的每个文件
+                                sub_file_path = file_path + '\\' + i
+                                real_sub_file_path = rmdir_path + '\\' + i
+                                # 非空的目录, 需要递归删除
+                                # print(sub_dir_dict[i])
+                                # print(type(sub_dir_dict[i]))
+                                # print(isinstance(sub_dir_dict[i], str))
+                                if isinstance(sub_dir_dict[i], dict) and sub_dir_dict[i]:
+                                    self.rm(sub_file_path, '-rf')
+                                # 空目录, 直接删除
+                                elif isinstance(sub_dir_dict[i], dict) and not sub_dir_dict[i]:
+                                    os.rmdir(real_sub_file_path)
+                                # 是文件, 强制删除
+                                elif isinstance(sub_dir_dict[i], str):
+                                    self.rm(sub_file_path, '-f')
+
+                            current_working_dict.pop(basename)
+                            os.rmdir(rmdir_path)
+
+                        # -r: 仅删除空文件夹
+                        else:
+                            # 同时修改文件树
+                            current_working_dict.pop(basename)
+                            os.rmdir(rmdir_path)
                     else:
                         print(
                             "rm -r: cannot remove '" +
@@ -350,7 +394,8 @@ class FileManager:
                     print(
                         "rm -r: cannot remove '" +
                         basename +
-                        "': Dir not empty")
+                        "': Dir not empty, try to use '-rf'")
+            # 空参数 或 -f 删文件
             elif mode == '' or mode == '-f':
                 try:
                     if basename in current_working_dict:
@@ -368,7 +413,6 @@ class FileManager:
                             os.remove(rm_path)
                             # 同时修改文件树
                             current_working_dict.pop(basename)
-                            print("rm success")
                 # 异常1 文件只读, 不可删除
                         else:
                             print(
@@ -386,7 +430,7 @@ class FileManager:
                     print("rm: cannot remove '" + basename +
                           "': Is a dir. Try to use -r option")
             else:
-                print("rm: invalid option'" + mode + "'")
+                print("rm: invalid option'" + mode + "', try '-r' / '-f' / '-rf'")
 
     # 更改文件属性, name为所该文件名称, type为四字字符(警告!此处未对此四字符进行错误检测)
     def chmod(self, file_path, file_type):
@@ -449,8 +493,8 @@ class FileManager:
     def display_storage_status(self):
         total = self.block_size * self.block_number  # 总字节数
         all_free = 0  # 剩余的总字节数
-        for fp, item in self.block_dir.items():
-            print("{:<10}: start {}\t length {}".format(fp, item[0], item[1]))
+        # for fp, item in self.block_dir.items():  # 调试用
+        #     print("{:<10}: start {}\t length {}".format(fp, item[0], item[1]))
         for i in range(self.block_number):
             b = self.all_blocks[i]
             occupy = self.block_size - b.get_free_space()
@@ -478,10 +522,10 @@ if __name__ == '__main__':
     # a.rm("1234")
     # a.display_storage_status()
 
-    a.cd('dir1')
+    a.rm('\dir1\dir2', '-rf')
     # a.ls('')
     # a.ls('\\f1')
     # a.pwd()
-    print(a.file_system_tree)
-    a.chmod(r'\dir1\dir2\dir3\\f5', 'cr--')
-    print(a.file_system_tree)
+    # print(a.file_system_tree)
+    # a.chmod(r'\dir1\dir2\dir3\\f5', 'cr--')
+    # print(a.file_system_tree)
