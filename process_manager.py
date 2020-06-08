@@ -5,6 +5,10 @@ import threading
 import sys
 import copy
 from hardware_resource import HardwareResource
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
 
 
 # 5 status of process: running, waiting, ready,terminated, waiting(Printer)
@@ -39,6 +43,10 @@ class ProcessManager:
         self.current_running = -1
         self.pcb_list = []
         self.printer = HardwareResource(printer_num)
+        self.devices = ['cpu', 'printer']
+        self.resources_history = {i:[] for i in self.devices}
+        self.history_length = 10.0
+        self.running = False
         # 2 queues, ready queue, waiting queue
         # at most 1 process is running
 
@@ -163,19 +171,34 @@ class ProcessManager:
         #  1 Printer is free,1 Printer is using  or  1 Printer is using,the recent free time is 2020-05-25 19:05:17
         # [Printer #0] pid: #0     starting_time: 2020-05-25 18:55:17   used time: 2     expect_free_time: 2020-05-25 19:05:17
 
+    def append_resources_history(self, type, pid):
+        unix_time = time.time()
+        if len(self.resources_history[type]) != 0:
+            last_unix_time = self.resources_history[type][-1][0]
+            if unix_time - last_unix_time > 2.0:  # idle time
+                self.resources_history[type].append([last_unix_time + 0.001, -1])
+                self.resources_history[type].append([unix_time - 0.001, -1])
+        self.resources_history[type].append([unix_time, pid])
+        while len(self.resources_history[type]) > 0 and unix_time - self.resources_history[type][0][0] > self.history_length:
+            self.resources_history[type] = self.resources_history[type][1:]
+
     # start scheduling
     def run(self):
-        while True:
+        self.running = True
+        while self.running:
             self.time_out()
             while self.current_running != -1 and self.pcb_list[self.current_running].command_queue[0][0] == "printer":
                 self.io_interrupt()
             if self.current_running != -1 and self.pcb_list[self.current_running].command_queue[0][0] == "fork":
                 self.fork()
+                time.sleep(self.time_slot)
+                self.append_resources_history('cpu', self.pcb_list[self.current_running].pid)
 
             time.sleep(self.time_slot)
 
             if self.current_running != -1:
                 self.pcb_list[self.current_running].command_queue[0][1] -= 1  # update cpu-working time
+                self.append_resources_history('cpu', self.pcb_list[self.current_running].pid)
                 if self.pcb_list[self.current_running].command_queue[0][1] == 0:
                     self.pcb_list[self.current_running].command_queue.pop(0)
                 if self.pcb_list[self.current_running].command_queue == []:
@@ -187,6 +210,7 @@ class ProcessManager:
             for info in self.printer.running_queue:
                 pid = info[0]
                 info[3] = info[3] + 1  # update used_time
+                self.append_resources_history('printer', self.pcb_list[self.current_running].pid)
                 self.pcb_list[pid].command_queue[0][1] -= 1
                 if self.pcb_list[pid].command_queue[0][1] == 0:
                     p = self.pcb_list[pid].priority
@@ -197,6 +221,32 @@ class ProcessManager:
                         print("[pid #%d] finish!" % self.pid)
                         self.pcb_list[pid].status = 'terminated'
                     self.release(pid)
+
+    def resource_monitor(self):
+        plt.clf()
+        n = len(self.resources_history.keys())
+        f, ax = plt.subplots(figsize=(6, 10), nrows=2)
+        end_time = time.time()
+        start_time = end_time - self.history_length
+        for i in self.devices:
+            x, y = [], []
+            for the_time, pid in self.resources_history[i]:
+                x.append(the_time - start_time)
+                y.append(0 if pid == -1 else 1)
+            if len(x) == 0:
+                x, y = [0, self.history_length], [0, 0]
+            ax[0].plot(x, y)
+        ax[0].legend(self.devices)
+        
+        sns.heatmap(data=[
+            [len(v) for v in self.resources_history]
+        ], cbar=None, ax=ax[1], xticklabels=['cpu', 'printer'], annot=True, 
+                linewidths=0.5, robust=True, cmap='YlGnBu')
+        plt.tight_layout()            
+
+        plt.savefig('resource_monitor.png')
+        print('Figure saved at resource_monitor.png')
+
 
     def input(self):
         while True:
