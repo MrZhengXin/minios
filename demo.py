@@ -21,8 +21,8 @@ data = pd.DataFrame(data)
 
 data = pd.DataFrame(data.values.T, index=data.columns, columns=data.index)
 
-seaborn.heatmap(data=[[10, 5]], cbar=None, ax=ax2, xticklabels=['cpu', 'printer'], annot=True, 
-                linewidths=0.5, robust=True, cmap='YlGnBu')
+seaborn.heatmap(data=data, cbar=None, ax=ax2, annot=True,
+                linewidths=0.5, robust=True)
 
 plt.tight_layout()
 plt.show()

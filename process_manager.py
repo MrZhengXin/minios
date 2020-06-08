@@ -184,8 +184,7 @@ class ProcessManager:
 
     # start scheduling
     def run(self):
-        self.running = True
-        while self.running:
+        while True:
             self.time_out()
             while self.current_running != -1 and self.pcb_list[self.current_running].command_queue[0][0] == "printer":
                 self.io_interrupt()
@@ -239,7 +238,7 @@ class ProcessManager:
         ax[0].legend(self.devices)
         
         sns.heatmap(data=[
-            [len(v) for v in self.resources_history]
+            [len(self.resources_history[v]) for v in self.resources_history.keys()]
         ], cbar=None, ax=ax[1], xticklabels=['cpu', 'printer'], annot=True, 
                 linewidths=0.5, robust=True, cmap='YlGnBu')
         plt.tight_layout()            
