@@ -31,7 +31,6 @@ class Shell:
                     match_res = re.match(arg + '$', file_name)
                     if match_res:
                         commands[i].append(match_res.group(0))
-        print(commands)
         return commands
 
     def deblock(self, *args):

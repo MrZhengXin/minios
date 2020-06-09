@@ -64,13 +64,17 @@ class ProcessManager:
         return self.cur_pid
 
 
+    # 2020.6.9 陈斌：判断是可执行的文件类型，才创建进程，否则提示错误
     def create_process(self, file):
-        self.pcb_list.append(ProcessControlBlock(self.cur_pid, 0, time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
-                                                 file['name'], file['priority'], file['content']))  # ppid of process created by OS is 0
-        self.ready_queue[file['priority']].append(self.cur_pid)
-        print("[pid %d] process created successfully" % self.cur_pid)
-        self.cur_pid += 1
-        return self.cur_pid
+        if file['type'][0] == 'e':
+            self.pcb_list.append(ProcessControlBlock(self.cur_pid, 0, time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
+                                                     file['name'], file['priority'], file['content']))  # ppid of process created by OS is 0
+            self.ready_queue[file['priority']].append(self.cur_pid)
+            print("[pid %d] process created successfully" % self.cur_pid)
+            self.cur_pid += 1
+            return self.cur_pid
+        else:
+            print('error:', file['name'], 'is not executable')
 
         # create PCB
         # insert into ready queue
