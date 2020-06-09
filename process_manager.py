@@ -185,7 +185,8 @@ class ProcessManager:
 
     # start scheduling
     def run(self):
-        while True:
+        self.running = True
+        while self.running:
             self.time_out()
             while self.current_running != -1 and self.pcb_list[self.current_running].command_queue[0][0] == "printer":
                 self.io_interrupt()
