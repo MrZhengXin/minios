@@ -1,5 +1,4 @@
 import signal
-
 from shell import Shell
 from file_manager import FileManager
 from memory_manager import MemoryManager
@@ -7,7 +6,6 @@ from process_manager import ProcessManager
 from config import *
 import os
 import threading
-import getopt
 
 
 class Kernel:
@@ -61,7 +59,9 @@ class Kernel:
     def run(self):
         while True:
             # a list of commands split by space or tab
-            command_split_list = self.my_shell.get_split_command(cwd=self.my_file_manager.current_working_path)
+            current_file_list = self.my_file_manager.ls(method='get')
+            command_split_list = self.my_shell.get_split_command(cwd=self.my_file_manager.current_working_path,
+                                                                 file_list=current_file_list)
 
             # this indicates user push Enter directly, then nothing to happen
             if len(command_split_list) == 0:
@@ -80,13 +80,16 @@ class Kernel:
 
                 elif tool == 'ls':
                     if argc >= 2:
-                        if argc == 2:
-                            if command_split[1][0] == '-':
-                                self.my_file_manager.ls(mode=command_split[1])
-                            else:
-                                self.my_file_manager.ls(dir_path=command_split[1])
+                        if command_split[1][0] == '-':
+                            mode = command_split[1]
+                            path_list = command_split[2:]
+                            if len(path_list) == 0:
+                                path_list = ['']
                         else:
-                            self.my_file_manager.ls(dir_path=command_split[2], mode=command_split[1])
+                            mode = ''
+                            path_list = command_split[1:]
+                        for path in path_list:
+                            self.my_file_manager.ls(dir_path=path, mode=mode)
                     else:
                         self.my_file_manager.ls()
 
@@ -98,10 +101,16 @@ class Kernel:
 
                 elif tool == 'rm':
                     if argc >= 2:
-                        if argc == 2:
-                            self.my_file_manager.rm(file_path=command_split[1])
+                        if command_split[1][0] == '-':
+                            mode = command_split[1]
+                            path_list = command_split[2:]
+                            if len(path_list) == 0:
+                                self.report_error(cmd=tool)
                         else:
-                            self.my_file_manager.rm(mode=command_split[1], file_path=command_split[2])
+                            mode = ''
+                            path_list = command_split[1:]
+                        for path in path_list:
+                            self.my_file_manager.rm(file_path=path, mode=mode)
                     else:
                         self.report_error(cmd=tool)
 
@@ -113,7 +122,8 @@ class Kernel:
 
                 elif tool == 'mkdir':
                     if argc >= 2:
-                        self.my_file_manager.mkdir(dir_path=command_split[1])
+                        for path in command_split[1:]:
+                            self.my_file_manager.mkdir(dir_path=path)
                     else:
                         self.report_error(cmd=tool)
 
@@ -144,12 +154,12 @@ class Kernel:
                     self.my_shell.block(func=self.my_process_manager.resource_status)
 
                 elif tool == 'kill':
-                    pid_to_kill = int(command_split[1])
                     if argc >= 2:
-                        # result of process killing
-                        kill_res = self.my_process_manager.kill_process(pid=pid_to_kill)
-                        if kill_res:
-                            self.my_memory_manager.free(pid=pid_to_kill)
+                        for pid in command_split[1:]:
+                            pid_to_kill = int(pid)
+                            kill_res = self.my_process_manager.kill_process(pid=pid_to_kill)
+                            if kill_res:
+                                self.my_memory_manager.free(pid=pid_to_kill)
                     else:
                         self.report_error(cmd=tool)
 

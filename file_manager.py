@@ -195,7 +195,9 @@ class FileManager:
         return (upper_path, basename)
 
     # command: ls
-    def ls(self, dir_path='', mode=''):  # dir_path为空时,列出当前目录文件; 非空(填相对路径时), 列出目标目录里的文件
+    # 2020.6.9 陈斌：添加method参数，当其为print，则代表原方法，否则为get，返回file_list
+    # method == 'get' 用于实现shell的正则表达式匹配功能
+    def ls(self, dir_path='', mode='', method='print'):  # dir_path为空时,列出当前目录文件; 非空(填相对路径时), 列出目标目录里的文件
         current_working_dict = self.path2dict(dir_path)
         # 异常1:ls路径出错. 由于path2dict()中已经报错 | 注: 此处偷懒 如果目标存在, 但不是文件夹, 同样报path
         # error
@@ -203,6 +205,10 @@ class FileManager:
             pass
         else:
             file_list = current_working_dict.keys()
+
+            if method == 'get':  # 2020.6.9 陈斌
+                return file_list
+
             # 目录为空时, 直接结束
             if len(file_list) == 0:
                 return
