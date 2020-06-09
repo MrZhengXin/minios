@@ -135,14 +135,21 @@ class Kernel:
 
                 elif tool == 'exec':
                     if argc >= 2:
-                        if argc == 2:
-                            my_file = self.my_file_manager.get_file(file_path=command_split[1])
+                        if command_split[1] == '-d':
+                            mode = '-d'
+                            if argc > 2:
+                                path_list = command_split[2:]
+                            else:
+                                self.report_error(cmd=tool)
+                        else:
+                            mode = ''
+                            path_list = command_split[1:]
+                        for path in path_list:
+                            my_file = self.my_file_manager.get_file(file_path=path)
                             if my_file:
                                 my_pid = self.my_process_manager.create_process(file=my_file)
                                 my_aid = self.my_memory_manager.alloc(pid=my_pid, size=int(my_file['size']))
                                 self.pid_to_aid[my_pid] = my_aid
-                        #elif command_split[1] == '-d':
-
 
                     else:
                         self.report_error(cmd=tool)

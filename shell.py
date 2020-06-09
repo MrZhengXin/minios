@@ -20,7 +20,9 @@ class Shell:
             commands = []
         for i in range(len(commands)):
             raw_command = commands[i].split()
-            commands[i] = []
+            if len(raw_command) == 0:
+                continue
+            commands[i] = [raw_command[0]]
             for arg in raw_command[1:]:
                 if arg[0] == '-':
                     commands[i].append(arg)
@@ -29,6 +31,7 @@ class Shell:
                     match_res = re.match(arg + '$', file_name)
                     if match_res:
                         commands[i].append(match_res.group(0))
+        print(commands)
         return commands
 
     def deblock(self, *args):
