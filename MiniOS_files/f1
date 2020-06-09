@@ -4,13 +4,13 @@
     "size": "233",
     "priority": 2,
     "content": [
-        "cpu 5",
-        "printer 10",
+        "cpu 1",
+        "printer 2",
 		"fork 5",
 		"access 157",
-        "cpu 3",
+        "cpu 1",
 		"fork 5",
 		"access 157",
-        "cpu 3"
+        "cpu 1"
     ]
 }

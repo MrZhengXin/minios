@@ -75,7 +75,7 @@ class FileManager:
                         gf_path = self.root_path + file_path
                     # 未解决异常! 直接把形参mode丢到open()了.
                     f = open(gf_path, mode)
-                    print("get_file success")
+                    # print("get_file success")
                     return json.load(f)
                 else:
                     print(
