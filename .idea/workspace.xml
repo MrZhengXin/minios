@@ -3,8 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="e84fa581-35f8-455f-b66e-394fae25de3f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MiniOS_files/f1" beforeDir="false" afterPath="$PROJECT_DIR$/MiniOS_files/f1" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/file_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/file_manager.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kernel.py" beforeDir="false" afterPath="$PROJECT_DIR$/kernel.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -14,25 +14,20 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/file_manager.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="661">
-              <caret line="426" lean-forward="true" selection-start-line="426" selection-end-line="426" />
+            <state relative-caret-position="254">
+              <caret line="77" column="47" selection-start-line="77" selection-start-column="47" selection-end-line="77" selection-end-column="47" />
               <folding>
-                <element signature="e#1376#2593#0" />
-                <element signature="e#2689#3542#0" />
-                <element signature="e#3580#3744#0" />
-                <element signature="e#3835#4411#0" />
-                <element signature="e#4482#5146#0" />
-                <element signature="e#5199#5467#0" />
-                <element signature="e#5580#6253#0" />
-                <element signature="e#6335#6770#0" />
-                <element signature="e#7798#9146#0" />
-                <element signature="e#9211#10090#0" />
-                <element signature="e#10199#11652#0" />
-                <element signature="e#11723#14824#0" />
-                <element signature="e#14933#16359#0" />
+                <element signature="e#2763#3616#0" />
+                <element signature="e#3654#3818#0" />
+                <element signature="e#3909#4485#0" />
+                <element signature="e#4556#5220#0" />
+                <element signature="e#5273#5541#0" />
+                <element signature="e#5654#6327#0" />
+                <element signature="e#6409#6844#0" />
+                <element signature="e#6960#8526#0" />
               </folding>
             </state>
           </provider>
@@ -41,17 +36,35 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/shell.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="184">
-              <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
+            <state relative-caret-position="328">
+              <caret line="37" lean-forward="true" selection-start-line="37" selection-end-line="37" />
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/demo.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="230">
+              <caret line="19" column="21" lean-forward="true" selection-start-line="19" selection-start-column="21" selection-end-line="19" selection-end-column="21" />
+              <folding>
+                <element signature="e#0#14#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/kernel.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="299">
-              <caret line="25" column="25" lean-forward="true" selection-start-line="25" selection-start-column="25" selection-end-line="25" selection-end-column="25" />
+            <state relative-caret-position="140">
+              <caret line="151" column="34" selection-start-line="151" selection-start-column="34" selection-end-line="151" selection-end-column="34" />
+              <folding>
+                <element signature="e#0#13#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -60,7 +73,7 @@
         <entry file="file://$PROJECT_DIR$/config.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="115">
-              <caret line="5" selection-start-line="5" selection-end-line="5" />
+              <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
             </state>
           </provider>
         </entry>
@@ -68,11 +81,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/memory_manager.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2921">
-              <caret line="173" column="31" selection-start-line="173" selection-start-column="31" selection-end-line="173" selection-end-column="31" />
-              <folding>
-                <element signature="e#2789#3693#0" />
-              </folding>
+            <state relative-caret-position="234">
+              <caret line="47" lean-forward="true" selection-start-line="47" selection-end-line="47" />
             </state>
           </provider>
         </entry>
@@ -80,8 +90,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/process_manager.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="989">
-              <caret line="48" column="25" selection-start-line="48" selection-start-column="25" selection-end-line="48" selection-end-column="25" />
+            <state relative-caret-position="301">
+              <caret line="77" lean-forward="true" selection-start-line="77" selection-end-line="77" />
               <folding>
                 <element signature="e#15#26#0" expanded="true" />
               </folding>
@@ -102,10 +112,12 @@
     <findStrings>
       <find>command_splitted</find>
       <find>get_splitted_command</find>
-      <find>get</find>
       <find>load_dict</find>
       <find>fork</find>
       <find>base_address</find>
+      <find>pwd</find>
+      <find>mkf</find>
+      <find>get</find>
     </findStrings>
     <replaceStrings>
       <replace>command_split</replace>
@@ -129,23 +141,24 @@
         <option value="$PROJECT_DIR$/Device/printer.py" />
         <option value="$PROJECT_DIR$/ProcessManager/process_manager.py" />
         <option value="$PROJECT_DIR$/device.py" />
-        <option value="$PROJECT_DIR$/demo.py" />
         <option value="$PROJECT_DIR$/hardware_resource.py" />
-        <option value="$PROJECT_DIR$/memory_manager.py" />
-        <option value="$PROJECT_DIR$/shell.py" />
         <option value="$PROJECT_DIR$/start.py" />
         <option value="$PROJECT_DIR$/config.py" />
-        <option value="$PROJECT_DIR$/process_manager.py" />
-        <option value="$PROJECT_DIR$/file_manager.py" />
+        <option value="$PROJECT_DIR$/demo.py" />
+        <option value="$PROJECT_DIR$/memory_manager.py" />
         <option value="$PROJECT_DIR$/kernel.py" />
+        <option value="$PROJECT_DIR$/shell.py" />
+        <option value="$PROJECT_DIR$/process_manager.py" />
+        <option value="$PROJECT_DIR$/MiniOS_files/f1" />
+        <option value="$PROJECT_DIR$/file_manager.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="1092" />
-    <option name="y" value="147" />
-    <option name="width" value="1939" />
-    <option name="height" value="1050" />
+    <option name="x" value="-14" />
+    <option name="y" value="-14" />
+    <option name="width" value="1532" />
+    <option name="height" value="1460" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -158,6 +171,11 @@
             <path>
               <item name="minios" type="b2602c69:ProjectViewProjectNode" />
               <item name="minios" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="minios" type="b2602c69:ProjectViewProjectNode" />
+              <item name="minios" type="462c0819:PsiDirectoryNode" />
+              <item name="MiniOS_files" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -284,9 +302,9 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.kernel" />
-        <item itemvalue="Python.file_manager" />
         <item itemvalue="Python.shell" />
         <item itemvalue="Python.demo" />
+        <item itemvalue="Python.file_manager" />
       </list>
     </recent_temporary>
   </component>
@@ -311,6 +329,7 @@
       <workItem from="1590761930986" duration="984000" />
       <workItem from="1590809441003" duration="4212000" />
       <workItem from="1590818827730" duration="2444000" />
+      <workItem from="1591664487270" duration="9290000" />
     </task>
     <task id="LOCAL-00001" summary="modified kernel">
       <created>1590818896394</created>
@@ -347,28 +366,70 @@
       <option name="project" value="LOCAL" />
       <updated>1590819429980</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="modified kernel">
+      <created>1591282144402</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1591282144404</updated>
+    </task>
+    <task id="LOCAL-00007" summary="modified kernel">
+      <created>1591665804129</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1591665804129</updated>
+    </task>
+    <task id="LOCAL-00008" summary="fixed a bug">
+      <created>1591680432942</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1591680432942</updated>
+    </task>
+    <task id="LOCAL-00009" summary="fixed some bugs and add regular expression matching in Shell">
+      <created>1591683535978</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1591683535978</updated>
+    </task>
+    <task id="LOCAL-00010" summary="fixed some bugs">
+      <created>1591684094254</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1591684094254</updated>
+    </task>
+    <task id="LOCAL-00011" summary="fixed a bug of create process">
+      <created>1591684477775</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1591684477775</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="47524000" />
+    <option name="totallyTimeSpent" value="72007000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1477" height="797" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.20084566" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.20648344" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32882884" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.33533835" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.3518797" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="8" weight="0.44962406" />
+      <window_info anchor="bottom" id="Version Control" order="8" weight="0.10075188" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.34285715" />
@@ -377,7 +438,7 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="Remote Host" order="3" />
-      <window_info anchor="right" id="SciView" order="4" />
+      <window_info anchor="right" id="SciView" order="4" weight="0.2642706" />
       <window_info anchor="right" id="Database" order="5" />
     </layout>
   </component>
@@ -419,16 +480,37 @@
         </entry>
       </map>
     </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list />
+          </value>
+        </entry>
+        <entry key="User">
+          <value>
+            <list />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="VcsManagerConfiguration">
+    <MESSAGE value="a small mistake" />
     <MESSAGE value="modified kernel" />
-    <option name="LAST_COMMIT_MESSAGE" value="modified kernel" />
+    <MESSAGE value="fixed a bug" />
+    <MESSAGE value="fixed some bugs and add regular expression matching in Shell" />
+    <MESSAGE value="fixed some bugs" />
+    <MESSAGE value="fixed a bug of create process" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed a bug of create process" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/minios$shell.coverage" NAME="shell Coverage Results" MODIFIED="1591683584612" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/minios$demo.coverage" NAME="demo Coverage Results" MODIFIED="1591682850202" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MiniOS$file_manager.coverage" NAME="file_manager Coverage Results" MODIFIED="1590571929357" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MiniOS$shell.coverage" NAME="shell Coverage Results" MODIFIED="1590416954691" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MiniOS$kernel.coverage" NAME="kernel Coverage Results" MODIFIED="1590817394788" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/minios$kernel.coverage" NAME="kernel Coverage Results" MODIFIED="1590822039239" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/minios$kernel.coverage" NAME="kernel Coverage Results" MODIFIED="1591684491616" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MiniOS$demo.coverage" NAME="demo Coverage Results" MODIFIED="1589983008997" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="editorHistoryManager">
@@ -436,7 +518,6 @@
     <entry file="file://$PROJECT_DIR$/Disk/disk.py" />
     <entry file="file://$PROJECT_DIR$/FileManager/block.py" />
     <entry file="file://$PROJECT_DIR$/test_file" />
-    <entry file="file://$PROJECT_DIR$/demo.py" />
     <entry file="file://$PROJECT_DIR$/hardware_resource.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="46">
@@ -448,66 +529,84 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/小示例/demo.py" />
-    <entry file="file://$PROJECT_DIR$/config.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="5" selection-start-line="5" selection-end-line="5" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/process_manager.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="989">
-          <caret line="48" column="25" selection-start-line="48" selection-start-column="25" selection-end-line="48" selection-end-column="25" />
+        <state relative-caret-position="301">
+          <caret line="77" lean-forward="true" selection-start-line="77" selection-end-line="77" />
           <folding>
             <element signature="e#15#26#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/file_manager.py">
+    <entry file="file://$PROJECT_DIR$/memory_manager.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="661">
-          <caret line="426" lean-forward="true" selection-start-line="426" selection-end-line="426" />
+        <state relative-caret-position="234">
+          <caret line="47" lean-forward="true" selection-start-line="47" selection-end-line="47" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/config.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="115">
+          <caret line="5" lean-forward="true" selection-start-line="5" selection-end-line="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/MiniOS_files/f1">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="322">
+          <caret line="14" column="5" lean-forward="true" selection-start-line="14" selection-start-column="5" selection-end-line="14" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resource_monitor.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/kernel.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="140">
+          <caret line="151" column="34" selection-start-line="151" selection-start-column="34" selection-end-line="151" selection-end-column="34" />
           <folding>
-            <element signature="e#1376#2593#0" />
-            <element signature="e#2689#3542#0" />
-            <element signature="e#3580#3744#0" />
-            <element signature="e#3835#4411#0" />
-            <element signature="e#4482#5146#0" />
-            <element signature="e#5199#5467#0" />
-            <element signature="e#5580#6253#0" />
-            <element signature="e#6335#6770#0" />
-            <element signature="e#7798#9146#0" />
-            <element signature="e#9211#10090#0" />
-            <element signature="e#10199#11652#0" />
-            <element signature="e#11723#14824#0" />
-            <element signature="e#14933#16359#0" />
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/demo.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="230">
+          <caret line="19" column="21" lean-forward="true" selection-start-line="19" selection-start-column="21" selection-end-line="19" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/shell.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="8" lean-forward="true" selection-start-line="8" selection-end-line="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/memory_manager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2921">
-          <caret line="173" column="31" selection-start-line="173" selection-start-column="31" selection-end-line="173" selection-end-column="31" />
+        <state relative-caret-position="328">
+          <caret line="37" lean-forward="true" selection-start-line="37" selection-end-line="37" />
           <folding>
-            <element signature="e#2789#3693#0" />
+            <element signature="e#0#15#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/kernel.py">
+    <entry file="file://$PROJECT_DIR$/file_manager.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="299">
-          <caret line="25" column="25" lean-forward="true" selection-start-line="25" selection-start-column="25" selection-end-line="25" selection-end-column="25" />
+        <state relative-caret-position="254">
+          <caret line="77" column="47" selection-start-line="77" selection-start-column="47" selection-end-line="77" selection-end-column="47" />
+          <folding>
+            <element signature="e#2763#3616#0" />
+            <element signature="e#3654#3818#0" />
+            <element signature="e#3909#4485#0" />
+            <element signature="e#4556#5220#0" />
+            <element signature="e#5273#5541#0" />
+            <element signature="e#5654#6327#0" />
+            <element signature="e#6409#6844#0" />
+            <element signature="e#6960#8526#0" />
+          </folding>
         </state>
       </provider>
     </entry>

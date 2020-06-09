@@ -82,7 +82,7 @@ class MemoryManager:
 
     # pid and aid not all be None
     # return True or False, if failed, report error
-    def free(self, pid, aid):
+    def free(self, pid, aid=None):
         if self.mode == 'p':
             return self.page_free(pid, aid)
         elif self.mode == 'cb':
