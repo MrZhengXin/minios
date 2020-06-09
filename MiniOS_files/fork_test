@@ -1,13 +1,13 @@
 {
     "name": "fork_test",
-    "type": "crwx",
+    "type": "erwx",
     "size": "233",
-	"priority": 2,
+    "priority": 2,
     "content": [
         "fork 0",
-		"cpu 1",
+        "cpu 1",
         "fork 3",
-		"printer 1",
-		"cpu 1"
+        "printer 1",
+        "cpu 1"
     ]
 }

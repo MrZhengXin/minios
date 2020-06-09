@@ -118,6 +118,7 @@ class Kernel:
                     if argc >= 3:
                         self.my_file_manager.chmod(file_path=command_split[1], file_type=command_split[2])
                     else:
+                        print(command_split)
                         self.report_error(cmd=tool)
 
                 elif tool == 'mkdir':

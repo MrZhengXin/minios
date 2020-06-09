@@ -24,13 +24,15 @@ class Shell:
                 continue
             commands[i] = [raw_command[0]]
             for arg in raw_command[1:]:
-                if arg[0] == '-':
-                    commands[i].append(arg)
-                    continue
+                match_flag = False
                 for file_name in file_list:
                     match_res = re.match(arg + '$', file_name)
                     if match_res:
+                        match_flag = True
                         commands[i].append(match_res.group(0))
+                if match_flag is False:
+                    commands[i].append(arg)
+        # print(commands)
         return commands
 
     def deblock(self, *args):
