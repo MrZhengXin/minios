@@ -40,14 +40,14 @@ class Kernel:
     def display_command_description(self, cmd_list):
         command_to_description = {
             'man': 'manual page, format: man [command1] [command2] ...',
-            'ls': 'list directory contents, format: ls [path]',
+            'ls': 'list directory contents, format: ls [-a|-l|-al][path]',
             'cd': 'change current working directory, format: cd [path]',
-            'rm': 'remove file or directory recursively, format: rm [-r] path',
+            'rm': 'remove file or directory recursively, format: rm [-r|-f|-rf] path',
             'mkdir': 'make directory, format: mkdir path',
             # 'mkf': 'make file, format: mkf path',
             'dss': 'display storage status, format: dss',
             'dms': 'display memory status, format: dms',
-            'exec': 'create process, format: exec path',
+            'exec': 'execute file, format: exec path',
             'ps': 'display process status, format: ps',
             'rs': 'display resource status, format: rs',
             'kill': 'kill process, format: kill pid',
