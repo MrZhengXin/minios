@@ -173,11 +173,12 @@ class ProcessManager:
 
     def append_resources_history(self, type, pid):
         unix_time = time.time()
+        last_unix_time = unix_time - self.history_length
         if len(self.resources_history[type]) != 0:
             last_unix_time = self.resources_history[type][-1][0]
-            if unix_time - last_unix_time > 2.0:  # idle time
-                self.resources_history[type].append([last_unix_time + 0.001, -1])
-                self.resources_history[type].append([unix_time - 0.001, -1])
+        if unix_time - last_unix_time > 2.0:  # idle time
+            self.resources_history[type].append([last_unix_time + 0.001, -1])
+            self.resources_history[type].append([unix_time - 0.001, -1])
         self.resources_history[type].append([unix_time, pid])
         while len(self.resources_history[type]) > 0 and unix_time - self.resources_history[type][0][0] > self.history_length:
             self.resources_history[type] = self.resources_history[type][1:]
@@ -225,22 +226,33 @@ class ProcessManager:
         plt.clf()
         n = len(self.resources_history.keys())
         f, ax = plt.subplots(figsize=(6, 10), nrows=2)
+        ax[0].set_ylim(-0.1, 1.1)
         end_time = time.time()
         start_time = end_time - self.history_length
         for i in self.devices:
             x, y = [], []
+            
+            # remove too old records
+            while len(self.resources_history[i]) > 0 and self.resources_history[i][0][0] < start_time:
+                self.resources_history[i] =  self.resources_history[i][1:]
+
             for the_time, pid in self.resources_history[i]:
                 x.append(the_time - start_time)
                 y.append(0 if pid == -1 else 1)
             if len(x) == 0:
                 x, y = [0, self.history_length], [0, 0]
+            if x[-1] < self.history_length - 1.0:  # idle time at the end
+                x.append(x[-1] + 0.001)
+                y.append(0)
+                x.append(self.history_length)
+                y.append(0)
             ax[0].plot(x, y)
         ax[0].legend(self.devices)
         
         sns.heatmap(data=[
             [len(self.resources_history[v]) for v in self.resources_history.keys()]
         ], cbar=None, ax=ax[1], xticklabels=['cpu', 'printer'], annot=True, 
-                linewidths=0.5, robust=True, cmap='YlGnBu')
+                linewidths=0.5, robust=True, cmap='YlGnBu', vmin = 0, vmax = 10)
         plt.tight_layout()            
 
         plt.savefig('resource_monitor.png')
