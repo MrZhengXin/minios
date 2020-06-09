@@ -153,6 +153,9 @@ class Kernel:
                 elif tool == 'rs':
                     self.my_shell.block(func=self.my_process_manager.resource_status)
 
+                elif tool == 'mon':
+                    self.my_shell.block(func=self.my_process_manager.resource_monitor)
+
                 elif tool == 'kill':
                     if argc >= 2:
                         for pid in command_split[1:]:
