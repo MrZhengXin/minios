@@ -60,7 +60,7 @@ class Kernel:
 
     def run(self):
         while True:
-            # a list of commands split by space
+            # a list of commands split by space or tab
             command_split_list = self.my_shell.get_split_command(cwd=self.my_file_manager.current_working_path)
 
             # this indicates user push Enter directly, then nothing to happen
@@ -68,6 +68,9 @@ class Kernel:
                 continue
 
             for command_split in command_split_list:
+                if len(command_split) == 0:  # an empty command
+                    continue
+
                 tool = command_split[0]  # tool name, e.g. ls, cd, ...
 
                 argc = len(command_split)  # argument count

@@ -11,7 +11,7 @@ class Shell:
     def print_system_info(self):
         print('MiniOS 1.0', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-    # cwd: current working directory
+    # current working directory
     def get_split_command(self, cwd):
         try:
             commands = input(cwd + '$ ').split(';')
