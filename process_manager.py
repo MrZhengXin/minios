@@ -59,7 +59,7 @@ class ProcessManager:
         self.ready_queue[child_pcb.priority].append(self.cur_pid)
         self.pcb_list.append(child_pcb)
         sys.stdout.write('\033[2K\033[1G')  # avoid \$ [pid #1] finish!
-        print("[pid %d] process forked successfully" % self.cur_pid)
+        print("[pid %d] process forked successfully by [pid %d]" % (self.cur_pid, self.current_running))
         self.cur_pid += 1
         return self.cur_pid
 
