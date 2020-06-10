@@ -1,6 +1,9 @@
 # coding=utf-8
 import numpy as np
+import seaborn
 import pandas as pd
+import matplotlib.pyplot as plt
+import copy
 
 
 class PageTable:
@@ -24,7 +27,7 @@ class PageTable:
         """
         idx = address // page_size  # 页表偏移量
         if idx < len(self.table):
-            index = self.table.keys()[idx]  # 虚页号
+            index = list(self.table.keys())[idx]  # 虚页号
             return index
         else:
             return -1
@@ -54,9 +57,10 @@ class MemoryManager:
             self.virtual_memory = np.array([[page_size, -1, 0] for i in range(page_number)])
             # record = np.zeros((physical_page, 2))
             self.physical_memory = [-1 for i in range(physical_page)]
-            self.schedule_queue = []   # for LRU algorithm
+            self.schedule_queue = []  # for LRU algorithm
             self.ps = page_size
             self.pn = page_number
+            self.ppn = physical_page  # the number of physical page
             # record the page table of all the process, has a k_v as (pid: PageTable)
             self.page_tables = {}
             self.schedule = schedule
@@ -71,6 +75,14 @@ class MemoryManager:
         self.cur_aid = 0  # record every allocation
         self.total = page_number * page_size
         self.allocated = 0
+        self.physicalsize = 0
+
+        self.physical_rate = [0]
+        self.virtual_rate = [0]
+        self.physical_history = [copy.deepcopy(self.physical_memory)]
+        self.x = [0]
+        self.page_fault = 0
+        self.page_access = 0
 
     # load executable file into memory
     # if failed, report error and return -1
@@ -108,7 +120,7 @@ class MemoryManager:
                 if pid in self.page_tables.keys():  # the process has a page table
                     ptable = self.page_tables[pid]
                 else:  # the precess does not has a page table
-                    ptable = PageTable() # create one
+                    ptable = PageTable()  # create one
                     self.page_tables[pid] = ptable
                 ptable.insert(i)  # add the virtual page
                 if s >= self.ps:
@@ -204,15 +216,19 @@ class MemoryManager:
         for i in range(self.pn):
             if self.virtual_memory[i][1] == pid and (self.virtual_memory[i][2] == aid or aid is None):
                 status = 1
-                self.allocated -= self.virtual_memory[i][0]
+
+                if i in self.physical_memory:  # if the page in physical memory, free it.
+                    self.physical_memory[self.physical_memory.index(i)] = -1
+                    self.physicalsize -= self.virtual_memory[i][0]
+                    self.schedule_queue.remove(i)
+
+                ptable = self.page_tables[pid]  # to delete the process's page item
+                ptable.delete(i)
+
+                self.allocated -= self.virtual_memory[i][0]  # to free it from virtual memory.
                 self.virtual_memory[i][0] = self.ps
                 self.virtual_memory[i][1] = -1
                 self.virtual_memory[i][2] = 0
-                ptable = self.page_tables[pid]  # to delete the process's page item
-                if i in self.physical_memory:   # if the page in physical memory, free it too.
-                    self.physical_memory[self.physical_memory.index(i)] = -1
-                    self.schedule_queue.remove(i)
-                ptable.delete(i)
 
         if status == 0:
             print("error! That memory not Found.")
@@ -220,12 +236,15 @@ class MemoryManager:
         return True
 
     def access(self, pid, address):
+        self.page_access += 1  # plus 1 every time you access a page
         page_offset = address % self.ps
-        ptable = self.page_tables[pid]   # get the page table to be visited
+        ptable = self.page_tables[pid]  # get the page table to be visited
         virtual_pageID = ptable.transform(address, self.ps)  # calculate the exact page to be visited
-        if virtual_pageID == -1 or self.virtual_memory[virtual_pageID][0] < page_offset:   # if not existed
+
+        if virtual_pageID == -1 or self.virtual_memory[virtual_pageID][0] < page_offset:  # if not existed
             print("ERROR ADDRESS !!!!")
             return
+
         if self.schedule == 'LRU':
             self.LRU(virtual_pageID, ptable)
         pass  # more algorithm to be continued
@@ -239,14 +258,23 @@ class MemoryManager:
         if pnum in self.physical_memory:
             self.schedule_queue.remove(pnum)
             self.schedule_queue.append(pnum)
+
         elif -1 in self.physical_memory:
             self.physical_memory[self.physical_memory.index(-1)] = pnum
+            self.physicalsize += self.virtual_memory[pnum][0]
             self.schedule_queue.append(pnum)
             ptable.modify(pnum, self.physical_memory.index(pnum), 1)
+            self.page_fault += 1
+
         else:
             index = self.physical_memory.index(self.schedule_queue[0])
             self.physical_memory[index] = pnum
             pid = self.virtual_memory[self.schedule_queue[0]][2]
+
+            self.physicalsize -= self.virtual_memory[self.schedule_queue[0]][0]
+            self.physicalsize += self.virtual_memory[pnum][0]
+            self.page_fault += 1
+
             p1 = self.page_tables[pid]
             p1.modify(self.schedule_queue[0], 0, -1)
             self.schedule_queue.pop(0)
@@ -261,9 +289,9 @@ class MemoryManager:
         for i in range(self.pn):
             if self.virtual_memory[i][1] != -1 and self.virtual_memory[i][2] != -1:
                 print(
-                        "block #%d  %-4d/%-4d Byte(s)  pid =%-3d  aid =%-3d" % (i, self.virtual_memory[i][0], self.ps,
-                                                                                self.virtual_memory[i][1],
-                                                                                self.virtual_memory[i][2]))
+                    "block #%d  %-4d/%-4d Byte(s)  pid =%-3d  aid =%-3d" % (i, self.virtual_memory[i][0], self.ps,
+                                                                            self.virtual_memory[i][1],
+                                                                            self.virtual_memory[i][2]))
 
     def continue_show(self):
         print('total: %-dB allocated: %-dB free: %-dB' % (self.total, self.allocated,
@@ -275,6 +303,40 @@ class MemoryManager:
                                                                                              self.r[i][2],
                                                                                              self.r[i][3]))
 
+    def MemoryWatcher(self):
+        self.physical_rate.append(self.physicalsize / (self.ps * self.ppn))
+        self.virtual_rate.append(self.allocated / self.total)
+        self.x.append(self.x[-1] + 1)
+        temp = []
+        for i in self.physical_memory:
+            temp.append(self.virtual_memory[i][1])
+        if len(self.physical_history) < 10:
+            self.physical_history.append(temp)
+        else:
+            self.physical_history.pop(0)
+            self.physical_history.append(temp)
+
+        f, (ax1, ax2) = plt.subplots(figsize=(6, 10), nrows=2)
+
+        if len(self.x) > 10:
+            self.x = self.x[-10:]
+            ax1.plot(self.x, self.physical_rate[-10:], label='physical', c='r')
+            ax1.plot(self.x, self.virtual_rate[-10:], label='virtual', c='b')
+        else:
+            ax1.plot(self.x, self.physical_rate, label='physical', c='r')
+            ax1.plot(self.x, self.virtual_rate, label='virtual', c='b')
+        ax1.legend(['physical', 'virtual'])
+
+        physical_memory = pd.DataFrame(self.physical_history, columns=['#frame 0', '#frame 1', '#frame 2'])
+
+        physical_memory = pd.DataFrame(physical_memory.values.T, index=physical_memory.columns,
+                                       columns=physical_memory.index)
+        seaborn.heatmap(data=physical_memory, cbar=None, ax=ax2, annot=True,
+                        linewidths=0.5, robust=True)
+
+        plt.tight_layout()
+        plt.show()
+
 
 if __name__ == '__main__':
     mm = MemoryManager(mode='p')
@@ -282,21 +344,36 @@ if __name__ == '__main__':
     mm.display_memory_status()
     mm.alloc(1, 2000)
     mm.display_memory_status()
-    t1 = mm.alloc(1, 1094)
+    t1 = mm.alloc(2, 1094)
     mm.access(1, 1024)
-    mm.access(0, 234)
+    mm.MemoryWatcher()
+    mm.access(0, 150)
+    mm.MemoryWatcher()
     mm.access(1, 890)
-    mm.access(1, 769)
-    mm.access(1, 2345)
+    mm.MemoryWatcher()
+    mm.access(2, 1000)
+    mm.MemoryWatcher()
+    mm.access(1, 1999)
+    mm.MemoryWatcher()
     mm.display_memory_status()
-    mm.free(1, t1)
-    mm.alloc(2, 2456)
-    mm.access(2, 250)
-    mm.access(2, 1300)
-    mm.access(0, 1800)
+    mm.free(2, t1)
+    mm.MemoryWatcher()
+    mm.alloc(3, 2456)
+    mm.MemoryWatcher()
+    mm.access(3, 2000)
+    mm.MemoryWatcher()
+    mm.access(0, 100)
+    mm.MemoryWatcher()
+    mm.access(2, 1030)
+    mm.MemoryWatcher()
     mm.display_memory_status()
+    mm.MemoryWatcher()
     t2 = mm.alloc(1, 120)
+    mm.MemoryWatcher()
     mm.display_memory_status()
+    mm.MemoryWatcher()
     mm.alloc(1, 200)
+    mm.MemoryWatcher()
     mm.free(1, t2)
+    mm.MemoryWatcher()
     mm.display_memory_status()
