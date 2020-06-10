@@ -57,7 +57,8 @@ class MemoryManager:
             self.virtual_memory = np.array([[page_size, -1, 0] for i in range(page_number)])
             # record = np.zeros((physical_page, 2))
             self.physical_memory = [-1 for i in range(physical_page)]
-            self.schedule_queue = []  # for LRU algorithm
+            # for LRU algorithm, the first one is the Least Recent Used, the last is recently visited
+            self.schedule_queue = []
             self.ps = page_size
             self.pn = page_number
             self.ppn = physical_page  # the number of physical page
@@ -77,10 +78,11 @@ class MemoryManager:
         self.allocated = 0
         self.physicalsize = 0
 
+        # used for plotting
         self.physical_rate = [0]
         self.virtual_rate = [0]
         self.physical_history = [copy.deepcopy(self.physical_memory)]
-        self.x = [0]
+        self.x = [0]  # for x axis
         self.page_fault = 0
         self.page_access = 0
 
@@ -236,12 +238,17 @@ class MemoryManager:
         return True
 
     def access(self, pid, address):
+        '''
+        :param pid: the process to visit
+        :param address: the relative address of the process
+        '''
         self.page_access += 1  # plus 1 every time you access a page
-        page_offset = address % self.ps
+        page_offset = address % self.ps  # the offset within the page
         ptable = self.page_tables[pid]  # get the page table to be visited
         virtual_pageID = ptable.transform(address, self.ps)  # calculate the exact page to be visited
 
-        if virtual_pageID == -1 or self.virtual_memory[virtual_pageID][0] < page_offset:  # if not existed
+        if virtual_pageID == -1 or self.virtual_memory[virtual_pageID][0] < page_offset:
+            # if not existed or the offset illegal
             print("ERROR ADDRESS !!!!")
             return
 
@@ -254,33 +261,31 @@ class MemoryManager:
         :param pnum: the virtual page to be switched in physical memory
         :param ptable: the ptable records the virtual page
         """
-        print(pnum)
-        if pnum in self.physical_memory:
+        if pnum in self.physical_memory:  # the visiting page in physical memory, just change queue
             self.schedule_queue.remove(pnum)
             self.schedule_queue.append(pnum)
 
-        elif -1 in self.physical_memory:
+        elif -1 in self.physical_memory:  # the memory is still available
             self.physical_memory[self.physical_memory.index(-1)] = pnum
             self.physicalsize += self.virtual_memory[pnum][0]
-            self.schedule_queue.append(pnum)
-            ptable.modify(pnum, self.physical_memory.index(pnum), 1)
-            self.page_fault += 1
+            self.schedule_queue.append(pnum)   # enlarge queue
+            ptable.modify(pnum, self.physical_memory.index(pnum), 1)   # modify the page table
+            self.page_fault += 1  # page_fault ++
 
-        else:
-            index = self.physical_memory.index(self.schedule_queue[0])
+        else:  # switch page
+            index = self.physical_memory.index(self.schedule_queue[0])  # always switch out the first in the queue
             self.physical_memory[index] = pnum
             pid = self.virtual_memory[self.schedule_queue[0]][2]
 
-            self.physicalsize -= self.virtual_memory[self.schedule_queue[0]][0]
+            self.physicalsize -= self.virtual_memory[self.schedule_queue[0]][0]    # modify the physical memory status
             self.physicalsize += self.virtual_memory[pnum][0]
-            self.page_fault += 1
+            self.page_fault += 1   # page_fault ++
 
-            p1 = self.page_tables[pid]
+            p1 = self.page_tables[pid]  # change the page table and modify the queue
             p1.modify(self.schedule_queue[0], 0, -1)
             self.schedule_queue.pop(0)
             self.schedule_queue.append(pnum)
             ptable.modify(pnum, index, 1)
-        print('physical cache:', self.physical_memory)
         pass
 
     def page_show(self):
@@ -323,7 +328,6 @@ class MemoryManager:
         f, (ax1, ax2) = plt.subplots(figsize=(6, 10), nrows=2)
 
         ax1.set_xticks(self.x)
-        # ax2.set_xticks(self.x)
         ax1.set_title('%.2f memory access, page_fault rate %.2f' % (self.page_access, self.page_fault/self.page_access))
         if len(self.physical_rate) > 10:
             ax1.plot(self.x, self.physical_rate[-10:], label='physical', c='r')
