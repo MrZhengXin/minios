@@ -306,7 +306,11 @@ class MemoryManager:
     def MemoryWatcher(self):
         self.physical_rate.append(self.physicalsize / (self.ps * self.ppn))
         self.virtual_rate.append(self.allocated / self.total)
-        self.x.append(self.x[-1] + 1)
+        if len(self.x) < 10:
+            self.x.append(self.x[-1] + 1)
+        else:
+            self.x.pop(0)
+            self.x.append(self.x[-1] + 1)
         temp = []
         for i in self.physical_memory:
             temp.append(self.virtual_memory[i][1])
@@ -318,23 +322,27 @@ class MemoryManager:
 
         f, (ax1, ax2) = plt.subplots(figsize=(6, 10), nrows=2)
 
-        if len(self.x) > 10:
-            self.x = self.x[-10:]
+        ax1.set_xticks(self.x)
+        # ax2.set_xticks(self.x)
+        ax1.set_title('%.2f memory access, page_fault rate %.2f' % (self.page_access, self.page_fault/self.page_access))
+        if len(self.physical_rate) > 10:
             ax1.plot(self.x, self.physical_rate[-10:], label='physical', c='r')
             ax1.plot(self.x, self.virtual_rate[-10:], label='virtual', c='b')
         else:
+            ax1.set_xticks(self.x)
             ax1.plot(self.x, self.physical_rate, label='physical', c='r')
             ax1.plot(self.x, self.virtual_rate, label='virtual', c='b')
-        ax1.legend(['physical', 'virtual'])
+        ax1.legend(['physical', 'virtual'], loc=1)
 
         physical_memory = pd.DataFrame(self.physical_history, columns=['#frame 0', '#frame 1', '#frame 2'])
 
         physical_memory = pd.DataFrame(physical_memory.values.T, index=physical_memory.columns,
-                                       columns=physical_memory.index)
+                                       columns=self.x)
         seaborn.heatmap(data=physical_memory, cbar=None, ax=ax2, annot=True,
                         linewidths=0.5, robust=True)
 
         plt.tight_layout()
+        plt.savefig('watch%d' % self.x[-1])
         plt.show()
 
 
@@ -347,7 +355,7 @@ if __name__ == '__main__':
     t1 = mm.alloc(2, 1094)
     mm.access(1, 1024)
     mm.MemoryWatcher()
-    mm.access(0, 150)
+    mm.access(1, 150)
     mm.MemoryWatcher()
     mm.access(1, 890)
     mm.MemoryWatcher()
