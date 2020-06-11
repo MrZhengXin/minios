@@ -5,6 +5,10 @@ import threading
 import sys
 import copy
 from hardware_resource import HardwareResource
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+
 
 
 # 5 status of process: running, waiting, ready,terminated, waiting(Printer)
@@ -39,6 +43,10 @@ class ProcessManager:
         self.current_running = -1
         self.pcb_list = []
         self.printer = HardwareResource(printer_num)
+        self.devices = ['cpu', 'printer']
+        self.resources_history = {i:[] for i in self.devices}
+        self.history_length = 14.0
+        self.running = False
         # 2 queues, ready queue, waiting queue
         # at most 1 process is running
 
@@ -51,18 +59,22 @@ class ProcessManager:
         self.ready_queue[child_pcb.priority].append(self.cur_pid)
         self.pcb_list.append(child_pcb)
         sys.stdout.write('\033[2K\033[1G')  # avoid \$ [pid #1] finish!
-        print("[pid %d] process forked successfully" % self.cur_pid)
+        print("[pid %d] process forked successfully by [pid %d]" % (self.cur_pid, self.current_running))
         self.cur_pid += 1
         return self.cur_pid
 
 
+    # 2020.6.9 陈斌：判断是可执行的文件类型，才创建进程，否则提示错误
     def create_process(self, file):
-        self.pcb_list.append(ProcessControlBlock(self.cur_pid, 0, time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
-                                                 file['name'], file['priority'], file['content']))  # ppid of process created by OS is 0
-        self.ready_queue[file['priority']].append(self.cur_pid)
-        print("[pid %d] process created successfully" % self.cur_pid)
-        self.cur_pid += 1
-        return self.cur_pid
+        if file['type'][0] == 'e':
+            self.pcb_list.append(ProcessControlBlock(self.cur_pid, 0, time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
+                                                     file['name'], file['priority'], file['content']))  # ppid of process created by OS is 0
+            self.ready_queue[file['priority']].append(self.cur_pid)
+            print("[pid %d] process created successfully" % self.cur_pid)
+            self.cur_pid += 1
+            return self.cur_pid
+        else:
+            print('error:', file['name'], 'is not executable')
 
         # create PCB
         # insert into ready queue
@@ -163,19 +175,35 @@ class ProcessManager:
         #  1 Printer is free,1 Printer is using  or  1 Printer is using,the recent free time is 2020-05-25 19:05:17
         # [Printer #0] pid: #0     starting_time: 2020-05-25 18:55:17   used time: 2     expect_free_time: 2020-05-25 19:05:17
 
+    def append_resources_history(self, type, pid):
+        unix_time = int(time.time())
+        # last_unix_time = unix_time - self.history_length
+        # if len(self.resources_history[type]) != 0:
+            # last_unix_time = self.resources_history[type][-1][0]
+        # if unix_time - last_unix_time > 2.0:  # idle time
+            # self.resources_history[type].append([last_unix_time + 0.001, -1])
+            # self.resources_history[type].append([unix_time - 0.001, -1])
+        self.resources_history[type].append([unix_time, pid])
+        while len(self.resources_history[type]) > 0 and unix_time - self.resources_history[type][0][0] > self.history_length:
+            self.resources_history[type] = self.resources_history[type][1:]
+
     # start scheduling
     def run(self):
-        while True:
+        self.running = True
+        while self.running:
             self.time_out()
             while self.current_running != -1 and self.pcb_list[self.current_running].command_queue[0][0] == "printer":
                 self.io_interrupt()
             if self.current_running != -1 and self.pcb_list[self.current_running].command_queue[0][0] == "fork":
                 self.fork()
+                time.sleep(self.time_slot)
+                self.append_resources_history('cpu', self.pcb_list[self.current_running].pid)
 
             time.sleep(self.time_slot)
 
             if self.current_running != -1:
                 self.pcb_list[self.current_running].command_queue[0][1] -= 1  # update cpu-working time
+                self.append_resources_history('cpu', self.pcb_list[self.current_running].pid)
                 if self.pcb_list[self.current_running].command_queue[0][1] == 0:
                     self.pcb_list[self.current_running].command_queue.pop(0)
                 if self.pcb_list[self.current_running].command_queue == []:
@@ -187,6 +215,7 @@ class ProcessManager:
             for info in self.printer.running_queue:
                 pid = info[0]
                 info[3] = info[3] + 1  # update used_time
+                self.append_resources_history('printer', self.pcb_list[self.current_running].pid)
                 self.pcb_list[pid].command_queue[0][1] -= 1
                 if self.pcb_list[pid].command_queue[0][1] == 0:
                     p = self.pcb_list[pid].priority
@@ -197,6 +226,66 @@ class ProcessManager:
                         print("[pid #%d] finish!" % self.pid)
                         self.pcb_list[pid].status = 'terminated'
                     self.release(pid)
+
+    def resource_monitor(self):
+        plt.clf()
+        n = len(self.resources_history.keys())
+        f, ax = plt.subplots(figsize=(6, 10), nrows=2)
+        ax[0].set_ylim(-0.1, 1.1)
+        end_time = int(time.time())
+        start_time = end_time - 9
+        ys = []
+        for i in self.devices:
+            x, y = [], []
+            
+            # remove too old records
+            while len(self.resources_history[i]) > 0 and self.resources_history[i][0][0] < start_time - 4.0:
+                self.resources_history[i] =  self.resources_history[i][1:]
+
+            # calculate
+            average_utilization = 0.0
+            if len(self.resources_history[i]) > 0:
+                last_time = self.resources_history[i][0][0]
+                # idle at the begining
+                for j in range(start_time, last_time, 1):
+                    x.append(j - start_time)
+                    y.append(0)
+
+            for the_time, pid in self.resources_history[i]:
+                # idle time
+                for j in range(last_time + 1, the_time, 1):
+                    average_utilization = average_utilization * 0.5
+                    if j >= start_time:
+                        x.append(j - start_time)
+                        y.append(average_utilization)
+                last_time = the_time
+                # using time
+                average_utilization = average_utilization * 0.5 + 1 * 0.5
+                if the_time >= start_time:
+                    x.append(the_time - start_time)
+                    y.append(average_utilization)
+
+            # idle time at the end
+            if len(x) == 0:
+                x, y = [j for j in range(10)], [0 for j in range(10)]
+            else:
+                while x[-1]  < 9:
+                    average_utilization = average_utilization * 0.5
+                    x.append(x[-1]+1)
+                    y.append(average_utilization)
+            ax[0].plot(x, y)
+            ys.append(y)
+                
+        ax[0].legend(self.devices)
+        
+        assert len(ys[0]) == len(ys[1])
+        sns.heatmap(data=ys, cbar=None, ax=ax[1], yticklabels=['cpu', 'printer'], annot=True, 
+                linewidths=0.5, robust=True, cmap='YlGnBu', vmin = 0, vmax = 1.0)
+        plt.tight_layout()            
+
+        plt.savefig('resource_monitor.png')
+        print('Figure saved at resource_monitor.png')
+
 
     def input(self):
         while True:

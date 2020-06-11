@@ -19,7 +19,7 @@ class HardwareResource:
         if self.free_resource == 0:
             self.free_time = datetime.datetime.now() + datetime.timedelta(days=365)
             for info in self.running_queue:
-                self.free_time = min(self.free_time,info[2])
+                self.free_time = min(self.free_time, info[2])
             recent_free_time = self.free_time.strftime("%Y-%m-%d %H:%M:%S")
             print('%d Printer is using,the recent free time is %s' % (len(self.running_queue), recent_free_time))
         elif self.free_resource == self.resource_num:
