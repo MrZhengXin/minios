@@ -45,7 +45,7 @@ class ProcessManager:
         self.printer = HardwareResource(printer_num)
         self.devices = ['cpu', 'printer']
         self.resources_history = {i:[] for i in self.devices}
-        self.history_length = 10.0
+        self.history_length = 14.0
         self.running = False
         # 2 queues, ready queue, waiting queue
         # at most 1 process is running
@@ -176,13 +176,13 @@ class ProcessManager:
         # [Printer #0] pid: #0     starting_time: 2020-05-25 18:55:17   used time: 2     expect_free_time: 2020-05-25 19:05:17
 
     def append_resources_history(self, type, pid):
-        unix_time = time.time()
-        last_unix_time = unix_time - self.history_length
-        if len(self.resources_history[type]) != 0:
-            last_unix_time = self.resources_history[type][-1][0]
-        if unix_time - last_unix_time > 2.0:  # idle time
-            self.resources_history[type].append([last_unix_time + 0.001, -1])
-            self.resources_history[type].append([unix_time - 0.001, -1])
+        unix_time = int(time.time())
+        # last_unix_time = unix_time - self.history_length
+        # if len(self.resources_history[type]) != 0:
+            # last_unix_time = self.resources_history[type][-1][0]
+        # if unix_time - last_unix_time > 2.0:  # idle time
+            # self.resources_history[type].append([last_unix_time + 0.001, -1])
+            # self.resources_history[type].append([unix_time - 0.001, -1])
         self.resources_history[type].append([unix_time, pid])
         while len(self.resources_history[type]) > 0 and unix_time - self.resources_history[type][0][0] > self.history_length:
             self.resources_history[type] = self.resources_history[type][1:]
@@ -232,32 +232,55 @@ class ProcessManager:
         n = len(self.resources_history.keys())
         f, ax = plt.subplots(figsize=(6, 10), nrows=2)
         ax[0].set_ylim(-0.1, 1.1)
-        end_time = time.time()
-        start_time = end_time - self.history_length
+        end_time = int(time.time())
+        start_time = end_time - 9
+        ys = []
         for i in self.devices:
             x, y = [], []
             
             # remove too old records
-            while len(self.resources_history[i]) > 0 and self.resources_history[i][0][0] < start_time:
+            while len(self.resources_history[i]) > 0 and self.resources_history[i][0][0] < start_time - 4.0:
                 self.resources_history[i] =  self.resources_history[i][1:]
 
+            # calculate
+            average_utilization = 0.0
+            if len(self.resources_history[i]) > 0:
+                last_time = self.resources_history[i][0][0]
+                # idle at the begining
+                for j in range(start_time, last_time, 1):
+                    x.append(j - start_time)
+                    y.append(0)
+
             for the_time, pid in self.resources_history[i]:
-                x.append(the_time - start_time)
-                y.append(0 if pid == -1 else 1)
+                # idle time
+                for j in range(last_time + 1, the_time, 1):
+                    average_utilization = average_utilization * 0.5
+                    if j >= start_time:
+                        x.append(j - start_time)
+                        y.append(average_utilization)
+                last_time = the_time
+                # using time
+                average_utilization = average_utilization * 0.5 + 1 * 0.5
+                if the_time >= start_time:
+                    x.append(the_time - start_time)
+                    y.append(average_utilization)
+
+            # idle time at the end
             if len(x) == 0:
-                x, y = [0, self.history_length], [0, 0]
-            if x[-1] < self.history_length - 1.0:  # idle time at the end
-                x.append(x[-1] + 0.001)
-                y.append(0)
-                x.append(self.history_length)
-                y.append(0)
+                x, y = [j for j in range(10)], [0 for j in range(10)]
+            else:
+                while x[-1]  < 9:
+                    average_utilization = average_utilization * 0.5
+                    x.append(x[-1]+1)
+                    y.append(average_utilization)
             ax[0].plot(x, y)
+            ys.append(y)
+                
         ax[0].legend(self.devices)
         
-        sns.heatmap(data=[
-            [len(self.resources_history[v]) for v in self.resources_history.keys()]
-        ], cbar=None, ax=ax[1], xticklabels=['cpu', 'printer'], annot=True, 
-                linewidths=0.5, robust=True, cmap='YlGnBu', vmin = 0, vmax = 10)
+        assert len(ys[0]) == len(ys[1])
+        sns.heatmap(data=ys, cbar=None, ax=ax[1], yticklabels=['cpu', 'printer'], annot=True, 
+                linewidths=0.5, robust=True, cmap='YlGnBu', vmin = 0, vmax = 1.0)
         plt.tight_layout()            
 
         plt.savefig('resource_monitor.png')
