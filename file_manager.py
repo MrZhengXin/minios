@@ -1,21 +1,18 @@
 import json
 import os
 import copy
+import time
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
 
 class Block:
-    def __init__(self, total_space):
+    def __init__(self, total_space, loc):
 
         self.total_space = total_space
-
         self.free_space = total_space
-
         self.fp = None
-
-    def is_free(self):
-        if self.total_space == self.free_space:
-            return True
-        else:
-            return False
+        self.loc = loc
 
     def set_free_space(self, fs):
         self.free_space = fs
@@ -29,24 +26,33 @@ class Block:
     def get_fp(self):
         return self.fp
 
+    def get_loc(self):
+        return self.loc
+
 
 class FileManager:
 
     file_separator = os.sep
     root_path = os.getcwd() + file_separator + 'MiniOS_files'  # Win下为\, linux下需要修改!
 
-    def __init__(self, block_size=512, block_number=12):  # block_size的单位:Byte
+    def __init__(self, block_size=512, tracks=200, secs=12):  # block_size的单位:Byte
         self.current_working_path = self.file_separator  # 当前工作目录相对路径, 可以与root_path一起构成绝对路径
 
         self.block_size = block_size
+        self.block_number = tracks * secs
+        self.tracks = tracks
+        self.secs = secs
 
-        self.block_number = block_number
-
+        self.unfillable_block = [3, 6, 9, 17]
+        self.block_dir = {}
+        self.bitmap = []
         self.all_blocks = self._init_blocks()
 
-        self.block_dir = {}
-
+        self.set_unfillable_block()
         self.file_system_tree = self._init_file_system_tree(self.root_path)
+        self.free_unfillable_block()
+
+        self.disk = Disk()
 
     # load file into disk if success, return first block(linked list), else
     # report err
@@ -55,7 +61,29 @@ class FileManager:
 
     # return file, if failed, report error and return None.
     # file_path支持绝对路径, mode格式与函数open()约定的相同
-    def get_file(self, file_path, mode='r'):
+
+    # 展示函数, 调用时无任何文件打开, 但会模拟访存, 用预设的文件块
+    # 能明显体现出各寻道算法的优劣.
+    def get_file_demo(self,seek_algo = 'FCFS'):
+        seek_queue = [(98, 3), (183, 5), (37, 2), (122, 11), (119,5), (14, 0),
+                      (124, 8), (65, 5), (67, 1), (198,5), (105, 5), (53,3)]
+        if seek_algo == 'FCFS':
+            self.disk.FCFS(seek_queue)
+        elif seek_algo == 'SSTF':
+            self.disk.SSTF(seek_queue)
+        elif seek_algo == 'SCAN':
+            self.disk.SCAN(seek_queue)
+        elif seek_algo == 'C_SCAN':
+            self.disk.C_SCAN(seek_queue)
+        elif seek_algo == 'LOOK':
+            self.disk.LOOK(seek_queue)
+        elif seek_algo == 'C_LOOK':
+            self.disk.C_LOOK(seek_queue)
+        else:
+            print(
+                "get_file: cannot get file. '" + seek_algo + "' no such disk seek algorithm")
+
+    def get_file(self, file_path, mode='r', seek_algo = 'FCFS'):
         # 由于open()能完成绝大多数工作, 该函数的主要功能体现在排除异常:
         (upper_path, basename) = self.path_split(file_path)
         current_working_dict = self.path2dict(upper_path)
@@ -73,9 +101,29 @@ class FileManager:
                     # 绝对路径
                     else:
                         gf_path = self.root_path + file_path
+
+
+                    seek_queue = self.fp2loc(file_path)
+                    if seek_algo == 'FCFS':
+                        self.disk.FCFS(seek_queue)
+                    elif seek_algo == 'SSTF':
+                        self.disk.SSTF(seek_queue)
+                    elif seek_algo == 'SCAN':
+                        self.disk.SCAN(seek_queue)
+                    elif seek_algo == 'C_SCAN':
+                        self.disk.C_SCAN(seek_queue)
+                    elif seek_algo == 'LOOK':
+                        self.disk.LOOK(seek_queue)
+                    elif seek_algo == 'C_LOOK':
+                        self.disk.C_LOOK(seek_queue)
+                    else:
+                        print(
+                            "get_file: cannot get file '" +
+                            basename +
+                            "': '" + seek_algo + "' no such disk seek algorithm")
                     # 未解决异常! 直接把形参mode丢到open()了.
                     f = open(gf_path, mode)
-                    print("get_file success")
+                    # print("get_file success")
                     return json.load(f)
                 else:
                     print(
@@ -108,58 +156,128 @@ class FileManager:
                     if self.fill_file_into_blocks(
                             data, file_path[len(self.root_path):]) == -1:  # 将此文件的信息存于外存块中
                         # 没有足够的存储空间
-                        print("block storage error: No Enough Space")
+                        print("block storage error: No Enough Initial Space")
         return part_of_tree
 
-    def _init_blocks(self):
+    def cal_loc(self, block_num):  # 计算每个文件块所绑定的位置
+        track = int(block_num / self.secs)
+        sec = block_num % self.secs
+        return track, sec
+
+    def fp2loc(self, fp):  # 输入fp，得到其位置list
+        # 当fp为相对路径时, 转成绝对路径
+        if fp[0] != self.file_separator:
+            fp = self.current_working_path + fp
+        start, length, size = self.block_dir[fp]
+        loc_list = []
+        for i in range(start, start + length):
+            loc_list.append(self.all_blocks[i].get_loc())
+        return loc_list
+
+    def bitmap2str(self, bm):  # 将ndarray类型的bitmap转换为string
+        return "".join([str(int(x)) for x in list(bm)])
+
+    def _init_blocks(self):  # 初始化文件块
         blocks = []  # 块序列
         for i in range(self.block_number):  # 新分配blocks
-            b = Block(self.block_size)
+            b = Block(self.block_size, self.cal_loc(i))
             blocks.append(b)
+        self.bitmap = np.ones(self.block_number)  # 初始化bitmap
         return blocks
 
-    def find_free_blocks(self, num):  # num:需要的blocks数，此函数用于寻找连续的num个free blocks
-        for i in self.all_blocks:  # 找到最后一个空闲块
-            if not i.is_free():
+    def block_first_fit(self, goal_str):  # first fit文件填充算法，goal_str指需要的连续块（bitmap形式）的字串
+        bitmap_str = self.bitmap2str(self.bitmap)
+        first_free_block = bitmap_str.find(goal_str)
+        return first_free_block
+
+    def block_best_fit(self, goal_str):  # best fit文件填充算法
+        count = 0
+        free_blocks = []
+        for i in range(len(self.bitmap)):  # 先遍历出所有free的blocks
+            bit = self.bitmap[i]
+            if bit == 0:
+                count = 0
                 continue
             else:
-                first_free_block = self.all_blocks.index(i)
-                flag = True
-                for j in range(1, num):
-                    if first_free_block + j >= self.block_number or \
-                            not self.all_blocks[first_free_block + j].is_free():  # 从这个开始的连续num个不满足皆空
-                        flag = False
-                        break
-                if flag:  # 如果找到了
-                    return first_free_block
-        return -1
+                if count == 0:
+                    free_blocks.append([i, 0])
+                count += 1
+                free_blocks[-1][1] = count
+        free_blocks = sorted(free_blocks, key=lambda k: k[1], reverse=False)
+        for i in free_blocks:
+            if i[1] >= len(goal_str):
+                return i[0]
 
-    def fill_file_into_blocks(self, f, fp):  # 将此文件的信息存于外存块中
+    def block_worst_fit(self, goal_str):  # worst fit文件填充算法
+        count = 0
+        free_blocks = []
+        for i in range(len(self.bitmap)):  # 先遍历出所有free的blocks
+            bit = self.bitmap[i]
+            if bit == 0:
+                count = 0
+                continue
+            else:
+                if count == 0:
+                    free_blocks.append([i, 0])
+                count += 1
+                free_blocks[-1][1] = count
+        free_blocks = sorted(free_blocks, key=lambda k: k[1], reverse=True)
+        return free_blocks[0][0]
+
+    def find_free_blocks(self, num, method=0):  # num:需要的blocks数，此函数用于寻找连续的num个free blocks
+        goal_str = self.bitmap2str(np.ones(num))
+        if method == 0:
+            return self.block_first_fit(goal_str)
+        elif method == 1:
+            return self.block_best_fit(goal_str)
+        elif method == 2:
+            return self.block_worst_fit(goal_str)
+        else:
+            print("error: please set a legal free blocks finding method.")
+            return -1
+
+    def fill_file_into_blocks(self, f, fp, method=0):  # 将此文件的信息存于外存块中
         num = int(int(f["size"]) / self.block_size)
         occupy = int(f["size"]) % self.block_size
-        first_free_block = self.find_free_blocks(num + 1)
+        first_free_block = self.find_free_blocks(num + 1, method)
         if first_free_block == -1:  # 没有足够空间存储此文件
             return -1
         free = self.block_size - occupy
-        self.block_dir[fp] = (first_free_block, num + 1)  # block分配信息存在dir中
-        count = first_free_block
+        self.block_dir[fp] = (first_free_block, num + 1, int(f["size"]))  # block分配信息存在dir中
+        count = int(first_free_block)
         for i in range(num + 1):
             if i == num:  # 最后一块可能有碎片
                 self.all_blocks[count].set_free_space(free)
             else:
                 self.all_blocks[count].set_free_space(0)
+            self.bitmap[count] = 0
             self.all_blocks[count].set_fp(fp)
             count += 1
         return 0
 
-    def delete_file_from_blocks(self, fp):
+    def delete_file_from_blocks(self, fp):  # 在文件块中删除文件
         start = self.block_dir[fp][0]
         length = self.block_dir[fp][1]
         for i in range(start, start + length):
             self.all_blocks[i].set_free_space(self.block_size)
             self.all_blocks[i].set_fp(None)
+            self.bitmap[i] = 1
         del self.block_dir[fp]
         return
+
+    def tidy_disk(self):  # 整理磁盘碎片
+        block_dir = copy.deepcopy(self.block_dir)
+        self.all_blocks = self._init_blocks()
+        for f in block_dir.items():
+            self.fill_file_into_blocks({"size": f[1][2]}, f[0])
+
+    def set_unfillable_block(self):
+        for i in self.unfillable_block:
+            self.bitmap[i] = 0
+
+    def free_unfillable_block(self):
+        for i in self.unfillable_block:
+            self.bitmap[i] = 1
 
     # 将 "目录的相对或绝对路径" 转化为 当前目录的字典, 用于之后的判断 文件存在 / 文件类型 几乎所有函数的第一句都是它
     def path2dict(self, dir_path):
@@ -173,8 +291,8 @@ class FileManager:
             for i in range(len(dir_list)):
                 dir_dict = dir_dict[dir_list[i]]
             if not isinstance(dir_dict, dict):
-                print("path error")
-                return -1
+                pass
+
             return dir_dict
         # 出错, 即认为路径与当前文件树不匹配, 后续函数会用它来判断"文件夹"是否存在
         except KeyError:
@@ -195,14 +313,34 @@ class FileManager:
         return (upper_path, basename)
 
     # command: ls
-    def ls(self, dir_path='', mode = ''):  # dir_path为空时,列出当前目录文件; 非空(填相对路径时), 列出目标目录里的文件
+    # 2020.6.9 陈斌：添加method参数，当其为print，则代表原方法，否则为get，返回file_list
+    # method == 'get' 用于实现shell的正则表达式匹配功能
+    def ls(self, dir_path='', mode='', method='print'):  # dir_path为空时,列出当前目录文件; 非空(填相对路径时), 列出目标目录里的文件
         current_working_dict = self.path2dict(dir_path)
         # 异常1:ls路径出错. 由于path2dict()中已经报错 | 注: 此处偷懒 如果目标存在, 但不是文件夹, 同样报path
         # error
         if current_working_dict == -1:
             pass
+        # ls的对象是一个文件，则只显示该文件的信息
+        elif not isinstance(current_working_dict, dict):
+            (upper_path, basename) = self.path_split(dir_path)
+            if current_working_dict[3] == 'x':
+                if mode == '-l' or mode == '-al':
+                    print(current_working_dict, '\t', '\033[1;32m' + basename + '\033[0m')
+                else:
+                    print('\033[1;32m' + basename + '\033[0m', '\t', end = '')
+            else:
+                if mode == '-l' or mode == '-al':
+                    print(current_working_dict, '\t', basename)
+                else:
+                    print(basename, '\t', end = '')
+        # ls的对象是一个文件夹，则显示文件夹内部的信息
         else:
             file_list = current_working_dict.keys()
+
+            if method == 'get':  # 2020.6.9 陈斌
+                return file_list
+
             # 目录为空时, 直接结束
             if len(file_list) == 0:
                 return
@@ -222,7 +360,7 @@ class FileManager:
                 # 可执行文件高亮绿色显示
                 elif current_working_dict[file][3] == 'x':
                     if mode == '-l' or mode == '-al':
-                        print(current_working_dict[file], '\t', '\033[1;34m' + file + '\033[0m')
+                        print(current_working_dict[file], '\t', '\033[1;32m' + file + '\033[0m')
                     else:
                         print('\033[1;32m' + file + '\033[0m', '\t', end='')
                 else:
@@ -272,8 +410,7 @@ class FileManager:
     # command: make dir
     def mkdir(self, dir_path):
         (upper_path, basename) = self.path_split(dir_path)
-        current_working_dict = self.path2dict(
-            upper_path)  # 将获取到的字典直接赋值, 对其修改可以影响到文件树
+        current_working_dict = self.path2dict(upper_path)  # 将获取到的字典直接赋值, 对其修改可以影响到文件树
         # 异常1 路径出错
         if current_working_dict == -1:
             pass
@@ -318,7 +455,7 @@ class FileManager:
                 else:
                     mkf_path = file_path
                 if self.fill_file_into_blocks(
-                        json_text, mkf_path) == -1:  # 测试是否能装入block
+                        json_text, mkf_path, method=2) == -1:  # 测试是否能装入block
                     print(
                         "mkf: cannot create file'" +
                         basename +
@@ -373,14 +510,15 @@ class FileManager:
                                 elif isinstance(sub_dir_dict[i], str):
                                     self.rm(sub_file_path, '-f')
 
-                            current_working_dict.pop(basename)
                             os.rmdir(rmdir_path)
+                            current_working_dict.pop(basename)
 
                         # -r: 仅删除空文件夹
                         else:
                             # 同时修改文件树
-                            current_working_dict.pop(basename)
                             os.rmdir(rmdir_path)
+                            current_working_dict.pop(basename)
+
                     else:
                         print(
                             "rm -r: cannot remove '" +
@@ -477,55 +615,305 @@ class FileManager:
     #         print(self.current_working_path)
 
     # 仅做调试用, 将文件树很好看地打印出来
+
     def tree_dir(self, dir=root_path, layer=0):
         listdir = os.listdir(dir)
         for index, file in enumerate(listdir):
             file_path = os.path.join(dir, file)
             print("|  " * (layer - 1), end="")
-            if (layer > 0):
+            if layer > 0:
                 print("`--" if index == len(listdir) - 1 else "|--", end="")
             print(file)
-            if (os.path.isdir(file_path)):
+            if os.path.isdir(file_path):
                 self.tree_dir(file_path, layer + 1)
 
     # command: dss
     # print status of all blocks
     def display_storage_status(self):
         total = self.block_size * self.block_number  # 总字节数
-        all_free = 0  # 剩余的总字节数
-        # for fp, item in self.block_dir.items():  # 调试用
-        #     print("{:<10}: start {}\t length {}".format(fp, item[0], item[1]))
-        for i in range(self.block_number):
-            b = self.all_blocks[i]
-            occupy = self.block_size - b.get_free_space()
-            all_free += b.get_free_space()
-            print("block #{:<5} {:>5} / {} Byte(s)   {:<20}".format(i,
-                                                                    occupy, self.block_size, str(b.get_fp())))
-
+        all_free = len(np.nonzero(self.bitmap)[0])
+        all_free *= self.block_size  # 剩余的总字节数
         all_occupy = total - all_free  # 已占用的总字节数
         print(
             "total: {0} B,\t allocated: {1} B,\t free: {2} B\n".format(
                 total,
                 all_occupy,
                 all_free))
+        # for fp, item in self.block_dir.items():  # 调试用
+        #     print("{:<10}: start {}\t length {}".format(fp, item[0], item[1]))
+        for i in range(self.block_number):
+            b = self.all_blocks[i]
+            occupy = self.block_size - b.get_free_space()
+            # all_free += b.get_free_space()
+            print("block #{:<5} {:>5} / {} Byte(s)   {:<20}".format(i,
+                                                                    occupy, self.block_size, str(b.get_fp())))
 
-    # 目录的相对路径 转到 目录的键对应的值(字典)
+    # nowheadpointer 某次访存开始时磁头所在磁道号.
+    def set_disk_now_headpointer(self, now_headpointer = 0):
+        self.disk.set_now_headpointer(now_headpointer)
+
+    def set_disk_x_slow(self, x_slow = 10):
+        self.disk.set_x_slow(x_slow)
+
+    # 画出过去所有读写磁盘操作时的平均速度柱状图
+    def draw_disk_speed(self):
+        self.disk.draw_disk_speed()
+
+
+class Disk:
+    def __init__(self, now_headpointer = 53, x_slow = 10):
+        # 扇区大小 默认512byte
+        self.sector_size = 512
+        # 每磁道中扇区数 默认12
+        self.track_size = 12
+        # 总磁道数 默认200
+        self.track_num = 200
+        # 当前磁头所在磁道号
+        self.now_headpointer = now_headpointer
+
+        # 跨过一个磁道所用的时间 默认0.1ms （即平均寻道时间10ms）
+        self.seek_speed = 0.0001
+        # 平均寻扇区与读取的时间 默认4ms （约等于转速7200rpm）
+        self.rotate_speed = 0.004
+        # x_slow是减速倍数，由于time.sleep()精确到10ms级, 故默认放慢100倍
+        self.x_slow = x_slow
+        self.seek_speed = self.seek_speed * x_slow
+        self.rotate_speed = self.rotate_speed * x_slow
+
+        # 以下变量用于画图
+        # 总读写时间(单位:S)
+        self.total_time = 0
+        # 总读写量(单位:B)
+        self.total_byte = 0
+        # 总读写速度表(单位:B/s), 在每一次用于磁盘调度执行后, 记录总平均速度
+        self.total_speed_list = []
+        self.speed_list = []
+        self.algo_list = []
+
+    # 提供两个可修改参数,
+    # nowheadpointer 某次访存开始时磁头所在磁道号.
+    def set_now_headpointer(self,now_headpointer = 53):
+        self.now_headpointer = now_headpointer
+
+    #  x_slow为减速倍数, 让稍纵即逝的读文件过程变得缓慢, 推荐以及默认设置为10倍
+    def set_x_slow(self,x_slow=10):
+        # x_slow是减速倍数，由于time.sleep()精确到10ms级, 故默认放慢100倍
+        self.x_slow = x_slow
+        self.seek_speed = self.seek_speed * x_slow
+        self.rotate_speed = self.rotate_speed * x_slow
+
+    # 朴实无华地按照queue一个个访问磁盘
+    def seek_by_queue(self, seek_queue):
+        # 本次访存的耗时与读写量
+        this_time_time = 0
+        this_time_byte = 0
+        for seek_addr in seek_queue:
+            # 寻道:计算磁头所要移动的距离
+            track_distance = abs(seek_addr[0] - self.now_headpointer)
+            # 寻道:模拟延迟并移动磁头
+            time.sleep(track_distance * self.seek_speed)
+            # 记录耗时(考虑减速比)
+            this_time_time = this_time_time + (track_distance * self.seek_speed) / self.x_slow
+            # print("seek track:", seek_addr[0])
+            self.now_headpointer = seek_addr[0]
+
+            # 旋转:模拟寻扇区和读写延迟
+            # 记录耗时(考虑减速比), 当扇区为-1时, 不用读写
+            if seek_addr[1] == -1:
+                # print("pass")
+                pass
+            else:
+                time.sleep(self.rotate_speed)
+                this_time_time = this_time_time + self.rotate_speed / self.x_slow
+            # 记录读写量
+            this_time_byte = this_time_byte + self.sector_size
+        self.total_time = self.total_time + this_time_time
+        self.total_byte = self.total_byte + this_time_byte
+        print("disk access success: time used: ", round(this_time_time * 1000,5), "ms")
+        self.total_speed_list.append(self.total_byte / self.total_time)
+        self.speed_list.append(this_time_byte / this_time_time)
+
+
+    # 先来先服务
+    def FCFS(self,seek_queue):
+        self.seek_by_queue(seek_queue)
+        self.algo_list.append('FCFS')
+        self.draw_track(seek_queue,"FCFS")
+    # 最短寻道时间优先
+    def SSTF(self,seek_queue):
+        # 暂存经过SSTF排序后的seek_queue
+        temp_seek_queue = [(self.now_headpointer,0)]
+        while seek_queue:
+            min_track_distance = self.track_num
+            for seek_addr in seek_queue:
+                temp_now_headpointer = temp_seek_queue[-1][0]
+                track_distance = abs(seek_addr[0] - temp_now_headpointer)
+                if track_distance < min_track_distance:
+                    min_track_distance = track_distance
+                    loc = seek_queue.index(seek_addr)
+            temp_seek_queue.append(seek_queue[loc])
+            seek_queue.pop(loc)
+        temp_seek_queue.pop(0)
+        seek_queue = temp_seek_queue
+
+        self.seek_by_queue(seek_queue)
+        self.algo_list.append('SSTF')
+        self.draw_track(seek_queue, "SSTF")
+
+    # 先正向扫描,扫到头,再负向扫描
+    def SCAN(self,seek_queue):
+        # 暂存经过SCAN方法排序后的seek_queue
+        temp_seek_queue = []
+        seek_queue.sort(key = lambda item: item[0])
+        for loc in range(len(seek_queue)):
+            if seek_queue[loc][0] >= self.now_headpointer:
+                break
+        # 比now_headpointer大的部分,正序访问
+        temp_seek_queue.extend(seek_queue[loc:])
+        # 走到头
+        if temp_seek_queue == seek_queue:
+            pass
+        else:
+            temp_seek_queue.append((self.track_num-1,-1))
+            # 比now_headpointer小的部分,负序访问
+            temp_seek_queue.extend(seek_queue[loc - 1::-1])
+            seek_queue = temp_seek_queue
+        self.seek_by_queue(seek_queue)
+        self.algo_list.append('SCAN')
+        self.draw_track(seek_queue, "SCAN")
+
+    # 先正向扫描,扫到头,归0,再正向扫描
+    def C_SCAN(self,seek_queue):
+        # 暂存经过C_SCAN方法排序后的seek_queue
+        temp_seek_queue = []
+        seek_queue.sort(key = lambda item: item[0])
+        for loc in range(len(seek_queue)):
+            if seek_queue[loc][0] >= self.now_headpointer:
+                break
+        # 比now_headpointer大的部分,正序访问
+        temp_seek_queue.extend(seek_queue[loc:])
+        # 如果只有比now_headpointer大的部分,就不用回头了
+        if temp_seek_queue == seek_queue:
+            pass
+        else:
+            # 走到头
+            temp_seek_queue.append((self.track_num-1,-1))
+            # 归零
+            temp_seek_queue.append((0, -1))
+            # 比now_headpointer小的部分,负序访问
+            temp_seek_queue.extend(seek_queue[:loc])
+            seek_queue = temp_seek_queue
+        self.seek_by_queue(seek_queue)
+        self.algo_list.append('C_SCAN')
+        self.draw_track(seek_queue, "C_SCAN")
+
+    # 先正向扫描,不扫到头,再负向扫描
+    def LOOK(self,seek_queue):
+        # 暂存经过LOOK排序后的seek_queue
+        temp_seek_queue = []
+        seek_queue.sort(key = lambda item: item[0])
+        for loc in range(len(seek_queue)):
+            if seek_queue[loc][0] >= self.now_headpointer:
+                break
+        # 比now_headpointer大的部分,正序访问
+        temp_seek_queue.extend(seek_queue[loc:])
+        if temp_seek_queue == seek_queue:
+            pass
+        else:
+            # 比now_headpointer小的部分,负序访问
+            temp_seek_queue.extend(seek_queue[loc - 1::-1])
+            seek_queue = temp_seek_queue
+
+        self.seek_by_queue(seek_queue)
+        self.algo_list.append('LOOK')
+        self.draw_track(seek_queue, "LOOK")
+
+    # 先正向扫描,不扫到头,归0,再正向扫描
+    def C_LOOK(self, seek_queue):
+        # 暂存经过C_LOOK方法排序后的seek_queue
+        temp_seek_queue = []
+        seek_queue.sort(key = lambda item: item[0])
+        for loc in range(len(seek_queue)):
+            if seek_queue[loc][0] >= self.now_headpointer:
+                break
+        # 比now_headpointer大的部分,正序访问
+        temp_seek_queue.extend(seek_queue[loc:])
+        # 比now_headpointer小的部分,正序访问
+        temp_seek_queue.extend(seek_queue[:loc])
+        seek_queue = temp_seek_queue
+        self.seek_by_queue(seek_queue)
+        self.algo_list.append('C_LOOK')
+        self.draw_track(seek_queue, "C_LOOK")
+
+    def draw_disk_speed(self):
+        ax = plt.subplot()
+        plt.xlabel('disk access_algo')
+        plt.ylabel('speed: MB/s')
+        index = range(len(self.speed_list))
+        speed_list_MB = np.array(self.speed_list) / 1000
+        plt.bar(index, speed_list_MB, color="#87CEFA",width = 0.35)
+        plt.xticks(index, self.algo_list)
+        plt.show()
+
+    def draw_track(self,seek_queue,algo):
+        track_queue = []
+        for seek_addr in seek_queue:
+            track_queue.append(seek_addr[0])
+        ax = plt.subplot()
+        # plt.xlabel('')
+        plt.ylabel('track_no')
+        # 隐藏右上下边
+        ax.spines["right"].set_visible(False)
+        ax.spines["top"].set_visible(False)
+        ax.spines["bottom"].set_visible(False)
+        plt.xticks([])
+        plt.plot(track_queue, marker = '>', mec='r', mfc='w', color = 'k')
+        for i in range(len(track_queue)):
+            plt.text(i,track_queue[i],track_queue[i])
+        plt.title(algo + " track")
+        plt.show()
+
+
+
 
 if __name__ == '__main__':
     a = FileManager()
-    # # test block function of mkf and rm
+    # a.get_file('f1')
     # a.display_storage_status()
-    # a.mkf("abc", size="2333")
-    # a.display_storage_status()
-    # a.mkf("1234", size="1234")
-    # a.display_storage_status()
-    # a.rm("1234")
-    # a.display_storage_status()
+    # 新增实际磁盘位置返回函数+指定新文件填入算法+磁盘碎片整理，更改dss的输出方式（以文件块的空满为标准计算空闲空间，而不是实际字节数）
+    # a.rm("123")
+    # a.mkf("123", size="10000")
+    # a = FileManager()
+    # a.set_disk_now_headpointer(53)
+    # a.get_file('123', seek_algo = 'FCFS')
+    # a.set_disk_now_headpointer(53)
+    # a.get_file('123', seek_algo = 'SSTF')
+    # a.set_disk_now_headpointer(53)
+    # a.get_file('123', seek_algo = 'SCAN')
+    # a.set_disk_now_headpointer(53)
+    # a.get_file('123', seek_algo = 'C_SCAN')
+    # a.set_disk_now_headpointer(53)
+    # a.get_file('123', seek_algo = 'LOOK')
+    # a.set_disk_now_headpointer(53)
+    # a.get_file('123', seek_algo = 'C_LOOK')
+    # a.draw_disk_speed()
 
-    a.rm('\dir1\dir2', '-rf')
-    # a.ls('')
-    # a.ls('\\f1')
-    # a.pwd()
-    # print(a.file_system_tree)
-    # a.chmod(r'\dir1\dir2\dir3\\f5', 'cr--')
-    # print(a.file_system_tree)
+    a.set_disk_now_headpointer(53)
+    a.get_file_demo(seek_algo = 'FCFS')
+    a.set_disk_now_headpointer(53)
+    a.get_file_demo(seek_algo = 'SSTF')
+    a.set_disk_now_headpointer(53)
+    a.get_file_demo(seek_algo = 'SCAN')
+    a.set_disk_now_headpointer(53)
+    a.get_file_demo(seek_algo = 'C_SCAN')
+    a.set_disk_now_headpointer(53)
+    a.get_file_demo(seek_algo = 'LOOK')
+    a.set_disk_now_headpointer(53)
+    a.get_file_demo(seek_algo = 'C_LOOK')
+    a.draw_disk_speed()
+
+
+
+
+
+

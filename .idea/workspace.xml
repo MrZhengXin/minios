@@ -31,7 +31,7 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../../信息与知识获取/作业2/Search-Engine" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -49,7 +49,7 @@
       <recent name="C:\Users\Administrator\Desktop\MiniOS\Disk" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.kernel">
+  <component name="RunManager" selected="Python.file_manager">
     <configuration name="demo" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="MiniOS" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -140,9 +140,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.file_manager" />
         <item itemvalue="Python.kernel" />
         <item itemvalue="Python.shell" />
-        <item itemvalue="Python.file_manager" />
         <item itemvalue="Python.demo" />
       </list>
     </recent_temporary>
@@ -181,7 +181,9 @@
       <workItem from="1590809441003" duration="4212000" />
       <workItem from="1590818827730" duration="2444000" />
       <workItem from="1590922358675" duration="6883000" />
-      <workItem from="1591255896818" duration="934000" />
+      <workItem from="1591255896818" duration="1719000" />
+      <workItem from="1591272881456" duration="66000" />
+      <workItem from="1591710653800" duration="15701000" />
     </task>
     <task id="LOCAL-00001" summary="modified kernel">
       <created>1590818896394</created>
@@ -218,7 +220,21 @@
       <option name="project" value="LOCAL" />
       <updated>1590819429980</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="modified kernel">
+      <created>1591256935155</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1591256935155</updated>
+    </task>
+    <task id="LOCAL-00007" summary="modified kernel">
+      <created>1591256980547</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1591256980547</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -256,73 +272,76 @@
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="295" y="97" key="#Notifications/0.0.1536.864@0.0.1536.864" timestamp="1590922426337" />
-    <state x="349" y="30" key="CommitChangelistDialog2" timestamp="1591256933370">
+    <state x="665" y="34" key="CommitChangelistDialog2" timestamp="1591870201384">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="349" y="30" key="CommitChangelistDialog2/0.0.1536.864@0.0.1536.864" timestamp="1591256933370" />
-    <state width="700" height="466" key="DebuggerActiveHint" timestamp="1590932314935">
+    <state x="665" y="34" key="CommitChangelistDialog2/0.0.1536.864@0.0.1536.864" timestamp="1591870201384" />
+    <state width="1006" height="466" key="DebuggerActiveHint" timestamp="1591761417113">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="700" height="466" key="DebuggerActiveHint/0.0.1536.864@0.0.1536.864" timestamp="1590932314935" />
-    <state width="1493" height="190" key="GridCell.Tab.0.bottom" timestamp="1591256940581">
+    <state width="1006" height="466" key="DebuggerActiveHint/0.0.1536.864@0.0.1536.864" timestamp="1591761417113" />
+    <state x="93" y="93" width="1350" height="678" key="DiffContextDialog" timestamp="1591257022259">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="190" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1591256940581" />
-    <state width="1493" height="190" key="GridCell.Tab.0.center" timestamp="1591256940580">
+    <state x="93" y="93" width="1350" height="678" key="DiffContextDialog/0.0.1536.864@0.0.1536.864" timestamp="1591257022259" />
+    <state x="549" y="190" key="FileChooserDialogImpl" timestamp="1591272943273">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="190" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1591256940580" />
-    <state width="1493" height="190" key="GridCell.Tab.0.left" timestamp="1591256940580">
+    <state x="549" y="190" key="FileChooserDialogImpl/0.0.1536.864@0.0.1536.864" timestamp="1591272943273" />
+    <state width="1493" height="276" key="GridCell.Tab.0.bottom" timestamp="1591763543080">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="190" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1591256940580" />
-    <state width="1493" height="190" key="GridCell.Tab.0.right" timestamp="1591256940581">
+    <state width="1493" height="276" key="GridCell.Tab.0.bottom/0.0.1536.864@0.0.1536.864" timestamp="1591763543080" />
+    <state width="1493" height="276" key="GridCell.Tab.0.center" timestamp="1591763543080">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1493" height="190" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1591256940581" />
-    <state width="1346" height="271" key="GridCell.Tab.1.bottom" timestamp="1591007693585">
+    <state width="1493" height="276" key="GridCell.Tab.0.center/0.0.1536.864@0.0.1536.864" timestamp="1591763543080" />
+    <state width="1493" height="276" key="GridCell.Tab.0.left" timestamp="1591763543079">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1346" height="271" key="GridCell.Tab.1.bottom/0.0.1536.864@0.0.1536.864" timestamp="1591007693585" />
-    <state width="1346" height="271" key="GridCell.Tab.1.center" timestamp="1591007693585">
+    <state width="1493" height="276" key="GridCell.Tab.0.left/0.0.1536.864@0.0.1536.864" timestamp="1591763543079" />
+    <state width="1493" height="276" key="GridCell.Tab.0.right" timestamp="1591763543080">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1346" height="271" key="GridCell.Tab.1.center/0.0.1536.864@0.0.1536.864" timestamp="1591007693585" />
-    <state width="1346" height="271" key="GridCell.Tab.1.left" timestamp="1591007693585">
+    <state width="1493" height="276" key="GridCell.Tab.0.right/0.0.1536.864@0.0.1536.864" timestamp="1591763543080" />
+    <state width="1493" height="276" key="GridCell.Tab.1.bottom" timestamp="1591763543080">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1346" height="271" key="GridCell.Tab.1.left/0.0.1536.864@0.0.1536.864" timestamp="1591007693585" />
-    <state width="1346" height="271" key="GridCell.Tab.1.right" timestamp="1591007693585">
+    <state width="1493" height="276" key="GridCell.Tab.1.bottom/0.0.1536.864@0.0.1536.864" timestamp="1591763543080" />
+    <state width="1493" height="276" key="GridCell.Tab.1.center" timestamp="1591763543080">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state width="1346" height="271" key="GridCell.Tab.1.right/0.0.1536.864@0.0.1536.864" timestamp="1591007693585" />
-    <state x="395" y="264" key="com.intellij.ide.util.TipDialog" timestamp="1591255901050">
+    <state width="1493" height="276" key="GridCell.Tab.1.center/0.0.1536.864@0.0.1536.864" timestamp="1591763543080" />
+    <state width="1493" height="276" key="GridCell.Tab.1.left" timestamp="1591763543080">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="395" y="264" key="com.intellij.ide.util.TipDialog/0.0.1536.864@0.0.1536.864" timestamp="1591255901050" />
+    <state width="1493" height="276" key="GridCell.Tab.1.left/0.0.1536.864@0.0.1536.864" timestamp="1591763543080" />
+    <state width="1493" height="276" key="GridCell.Tab.1.right" timestamp="1591763543080">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state width="1493" height="276" key="GridCell.Tab.1.right/0.0.1536.864@0.0.1536.864" timestamp="1591763543080" />
+    <state x="395" y="264" key="com.intellij.ide.util.TipDialog" timestamp="1591272919379">
+      <screen x="0" y="0" width="1536" height="864" />
+    </state>
+    <state x="395" y="264" key="com.intellij.ide.util.TipDialog/0.0.1536.864@0.0.1536.864" timestamp="1591272919379" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/file_manager.py</url>
-          <line>347</line>
-          <option name="timeStamp" value="1" />
+          <line>181</line>
+          <option name="timeStamp" value="11" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/file_manager.py</url>
-          <line>389</line>
-          <option name="timeStamp" value="3" />
+          <line>608</line>
+          <option name="timeStamp" value="22" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/file_manager.py</url>
-          <line>392</line>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/file_manager.py</url>
-          <line>366</line>
-          <option name="timeStamp" value="5" />
+          <line>607</line>
+          <option name="timeStamp" value="23" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -333,7 +352,7 @@
     <SUITE FILE_PATH="coverage/MiniOS$kernel.coverage" NAME="kernel Coverage Results" MODIFIED="1590817394788" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MiniOS$shell.coverage" NAME="shell Coverage Results" MODIFIED="1590416954691" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/MiniOS$demo.coverage" NAME="demo Coverage Results" MODIFIED="1589983008997" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/minios$file_manager.coverage" NAME="file_manager Coverage Results" MODIFIED="1591256556603" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/minios$file_manager.coverage" NAME="file_manager Coverage Results" MODIFIED="1591762687603" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/minios$shell.coverage" NAME="shell Coverage Results" MODIFIED="1591256767869" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
