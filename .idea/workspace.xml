@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e84fa581-35f8-455f-b66e-394fae25de3f" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="e84fa581-35f8-455f-b66e-394fae25de3f" name="Default Changelist" comment="tz: add tidy_disk and 3 algos of assigning blocks.&#10;hr: add">
       <change beforePath="$PROJECT_DIR$/MiniOS_files/dir1/dir2/dir3/dir6/f4" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/MiniOS_files/dir1/dir2/dir3/f5" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/file_manager.py" beforeDir="false" afterPath="$PROJECT_DIR$/file_manager.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -184,6 +182,7 @@
       <workItem from="1591255896818" duration="1719000" />
       <workItem from="1591272881456" duration="66000" />
       <workItem from="1591710653800" duration="15701000" />
+      <workItem from="1591870039319" duration="250000" />
     </task>
     <task id="LOCAL-00001" summary="modified kernel">
       <created>1590818896394</created>
@@ -234,7 +233,14 @@
       <option name="project" value="LOCAL" />
       <updated>1591256980547</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="tz: add tidy_disk and 3 algos of assigning blocks.&#10;hr: add class Disk and 6 algos of finding headpointer.">
+      <created>1591870289793</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1591870289793</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -265,17 +271,18 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="modified kernel" />
-    <option name="LAST_COMMIT_MESSAGE" value="modified kernel" />
+    <MESSAGE value="tz: add tidy_disk and 3 algos of assigning blocks.&#10;hr: add class Disk and 6 algos of finding headpointer." />
+    <option name="LAST_COMMIT_MESSAGE" value="tz: add tidy_disk and 3 algos of assigning blocks.&#10;hr: add class Disk and 6 algos of finding headpointer." />
   </component>
   <component name="WindowStateProjectService">
     <state x="295" y="97" key="#Notifications" timestamp="1590922426337">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
     <state x="295" y="97" key="#Notifications/0.0.1536.864@0.0.1536.864" timestamp="1590922426337" />
-    <state x="665" y="34" key="CommitChangelistDialog2" timestamp="1591870201384">
+    <state x="202" y="42" width="837" height="744" key="CommitChangelistDialog2" timestamp="1591870324313">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
-    <state x="665" y="34" key="CommitChangelistDialog2/0.0.1536.864@0.0.1536.864" timestamp="1591870201384" />
+    <state x="202" y="42" width="837" height="744" key="CommitChangelistDialog2/0.0.1536.864@0.0.1536.864" timestamp="1591870324313" />
     <state width="1006" height="466" key="DebuggerActiveHint" timestamp="1591761417113">
       <screen x="0" y="0" width="1536" height="864" />
     </state>
@@ -330,18 +337,8 @@
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/file_manager.py</url>
-          <line>181</line>
+          <line>208</line>
           <option name="timeStamp" value="11" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/file_manager.py</url>
-          <line>608</line>
-          <option name="timeStamp" value="22" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/file_manager.py</url>
-          <line>607</line>
-          <option name="timeStamp" value="23" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
