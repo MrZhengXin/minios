@@ -136,8 +136,8 @@ class MemoryManager:
                 self.allocated += size
                 break
         # if the file cannot be loaded into memory then free the above allocation
-        if s > 0 and self.page_free(pid, aid):
-            print('1')
+        if s > 0:
+            self.page_free(pid, aid)
             return -1
         # if the file be loaded successfully
         return aid
@@ -266,7 +266,7 @@ class MemoryManager:
         :param pnum: the virtual page to be switched in physical memory
         :param ptable: the ptable records the virtual page
         """
-        if pnum in self.physical_memory:  # the visiting page in physical memory, just change queue
+        if ptable.table[pnum][1] == 1:  # the visiting page in physical memory, just change queue
             self.schedule_queue.remove(pnum)
             self.schedule_queue.append(pnum)
 
@@ -334,6 +334,8 @@ class MemoryManager:
         f, (ax1, ax2) = plt.subplots(figsize=(6, 10), nrows=2)
 
         ax1.set_xticks(self.x)
+        ax1.set_ylim(0, 1)
+        ax1.set_yticks(np.arange(0, 1.1, 0.1))
 
         # fixed a bug: divided by zero
         page_fault_rate = 0.0 if self.page_access == 0 else self.page_fault / self.page_access
