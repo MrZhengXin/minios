@@ -849,6 +849,7 @@ class Disk:
             self.draw_track(seek_queue, "C_LOOK")
 
     def draw_disk_speed(self):
+        plt.close("all")
         ax = plt.subplot()
         plt.xlabel('disk access_algo')
         plt.ylabel('speed: MB/s')
@@ -860,6 +861,7 @@ class Disk:
         # plt.show()
 
     def draw_track(self, seek_queue, algo):
+        plt.close("all")
         track_queue = []
         for seek_addr in seek_queue:
             track_queue.append(seek_addr[0])

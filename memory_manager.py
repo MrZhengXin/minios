@@ -137,6 +137,7 @@ class MemoryManager:
                 break
         # if the file cannot be loaded into memory then free the above allocation
         if s > 0 and self.page_free(pid, aid):
+            print('1')
             return -1
         # if the file be loaded successfully
         return aid
@@ -214,6 +215,7 @@ class MemoryManager:
 
     # find the aiming page and delete it from page table
     def page_free(self, pid, aid):
+        print('chenbin: debug', 'pid', pid, 'aid', aid)
         status = 0
         for i in range(self.pn):
             if self.virtual_memory[i][1] == pid and (self.virtual_memory[i][2] == aid or aid is None):
@@ -244,6 +246,9 @@ class MemoryManager:
         '''
         self.page_access += 1  # plus 1 every time you access a page
         page_offset = address % self.ps  # the offset within the page
+
+        print('chenbin: debug', 'pid', pid, 'address', address)
+
         ptable = self.page_tables[pid]  # get the page table to be visited
         virtual_pageID = ptable.transform(address, self.ps)  # calculate the exact page to be visited
 
@@ -309,6 +314,7 @@ class MemoryManager:
                                                                                              self.r[i][3]))
 
     def memory_watching(self):
+        plt.close("all")
         self.physical_rate.append(self.physicalsize / (self.ps * self.ppn))
         self.virtual_rate.append(self.allocated / self.total)
         if len(self.x) < 10:

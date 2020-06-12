@@ -13,17 +13,19 @@ import seaborn as sns
 
 # PCB
 class ProcessControlBlock:
-    def __init__(self, pid, ppid, create_time, name, priority, content):
+    def __init__(self, pid, ppid, create_time, name, priority, content, size):
         self.pid = pid
         self.ppid = ppid
         self.name = name
         self.create_time = create_time
         self.priority = priority
+        self.size = size
 
         self.command_queue = []  # init
         for command in content:  # change "cpu 5" -> ["cpu",5]
             info = str.split(command)
-            info[1] = int(info[1])
+            if len(info) > 1:
+                info[1] = int(info[1])
             self.command_queue.append(info)
         self.status = "ready"
 
@@ -54,26 +56,29 @@ class ProcessManager:
 
     def fork(self):
         self.pcb_list[self.current_running].command_queue.pop(0)  # command "fork" out
-        child_pcb = copy.deepcopy(self.pcb_list[self.current_running])
-        child_pcb.ppid = self.current_running  # parent pid is the current process pid
-        child_pcb.pid = self.cur_pid
-        child_pcb.create_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-        self.ready_queue[child_pcb.priority].append(self.cur_pid)
-        self.pcb_list.append(child_pcb)
-        sys.stdout.write('\033[2K\033[1G')  # avoid \$ [pid #1] finish!
-        print("[pid %d] process forked successfully by [pid %d]" % (self.cur_pid, self.current_running))
-        self.cur_pid += 1
-
-        return self.cur_pid
-
+        size_to_alloc = self.pcb_list[self.current_running].size
+        my_aid = self.memory_manager.alloc(pid=self.cur_pid, size=size_to_alloc)
+        if my_aid != -1:
+            child_pcb = copy.deepcopy(self.pcb_list[self.current_running])
+            child_pcb.ppid = self.current_running  # parent pid is the current process pid
+            child_pcb.pid = self.cur_pid
+            child_pcb.create_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+            self.ready_queue[child_pcb.priority].append(self.cur_pid)
+            self.pcb_list.append(child_pcb)
+            sys.stdout.write('\033[2K\033[1G')  # avoid \$ [pid #1] finish!
+            print("[pid %d] process forked successfully by [pid %d]" % (self.cur_pid, self.current_running))
+            self.cur_pid += 1
+            return self.cur_pid
+        else:
+            print('create new process failed: no enough memory')
 
     # 2020.6.9 陈斌：判断是可执行的文件类型，才创建进程，否则提示错误
     def create_process(self, file):
         if file['type'][0] == 'e':
             my_aid = self.memory_manager.alloc(pid=self.cur_pid, size=int(file['size']))
-            if my_aid == -1:
+            if my_aid != -1:
                 self.pcb_list.append(ProcessControlBlock(self.cur_pid, 0, time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
-                                                         file['name'], file['priority'], file['content']))  # ppid of process created by OS is 0
+                                                         file['name'], file['priority'], file['content'], int(file['size'])))  # ppid of process created by OS is 0
                 self.ready_queue[file['priority']].append(self.cur_pid)
                 print("[pid %d] process created successfully" % self.cur_pid)
                 self.cur_pid += 1
@@ -207,18 +212,30 @@ class ProcessManager:
                 time.sleep(self.time_slot)
                 self.append_resources_history('cpu', self.pcb_list[self.current_running].pid)
 
+            # 2020.6.12 add by chenbin
+            if self.current_running != -1 and self.pcb_list[self.current_running].command_queue[0][0] == "access":
+                address = int(self.pcb_list[self.current_running].command_queue[0][1])
+
+                self.memory_manager.access(pid=self.pcb_list[self.current_running].pid,
+                                               address=address)
+                #except:
+                #    print('[pid #%d] access address %d failed' % (self.current_running, address))
+                self.pcb_list[self.current_running].command_queue.pop(0)
+
             time.sleep(self.time_slot)
 
             if self.current_running != -1:
-                self.pcb_list[self.current_running].command_queue[0][1] -= 1  # update cpu-working time
-                self.append_resources_history('cpu', self.pcb_list[self.current_running].pid)
-                if self.pcb_list[self.current_running].command_queue[0][1] == 0:
-                    self.pcb_list[self.current_running].command_queue.pop(0)
-                if self.pcb_list[self.current_running].command_queue == []:
+                # print(self.pcb_list[self.current_running].command_queue)
+                if len(self.pcb_list[self.current_running].command_queue) == 0:
                     sys.stdout.write('\033[2K\033[1G')  # avoid \$ [pid #1] finish!
                     print("[pid #%d] finish!" % self.current_running)
                     self.pcb_list[self.current_running].status = 'terminated'
                     self.current_running = -1
+                elif len(self.pcb_list[self.current_running].command_queue[0]) > 1:
+                    self.pcb_list[self.current_running].command_queue[0][1] -= 1  # update cpu-working time
+                    self.append_resources_history('cpu', self.pcb_list[self.current_running].pid)
+                    if self.pcb_list[self.current_running].command_queue[0][1] == 0:
+                        self.pcb_list[self.current_running].command_queue.pop(0)
 
             for info in self.printer.running_queue:
                 pid = info[0]
@@ -236,7 +253,8 @@ class ProcessManager:
                     self.release(pid)
 
     def resource_monitor(self):
-        plt.clf()
+        plt.close("all")
+        # plt.clf()
         n = len(self.resources_history.keys())
         f, ax = plt.subplots(figsize=(6, 10), nrows=2)
         ax[0].set_ylim(-0.1, 1.1)
