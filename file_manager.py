@@ -850,7 +850,7 @@ class Disk:
 
     def draw_disk_speed(self):
         plt.close("all")
-        ax = plt.subplot()
+        # ax = plt.subplot()
         plt.xlabel('disk access_algo')
         plt.ylabel('speed: MB/s')
         index = range(len(self.speed_list))

@@ -229,6 +229,7 @@ class ProcessManager:
                 # print(self.pcb_list[self.current_running].command_queue)
                 if len(self.pcb_list[self.current_running].command_queue) == 0:
                     sys.stdout.write('\033[2K\033[1G')  # avoid \$ [pid #1] finish!
+                    self.memory_manager.free(self.current_running)
                     print("[pid #%d] finish!" % self.current_running)
                     self.pcb_list[self.current_running].status = 'terminated'
                     self.current_running = -1

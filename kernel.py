@@ -1,4 +1,5 @@
 import signal
+from colorama import init
 from time import sleep
 from shell import Shell
 from file_manager import FileManager
@@ -7,6 +8,7 @@ from process_manager import ProcessManager
 from config import *
 import os
 import threading
+import matplotlib
 
 
 class Kernel:
@@ -24,7 +26,7 @@ class Kernel:
         self.my_process_manager_run_thread = threading.Thread(target=self.my_process_manager.run)
         self.my_process_manager_run_thread.start()
 
-        signal.signal(signal.SIGINT, self.my_shell.deblock)
+        # signal.signal(signal.SIGINT, self.my_shell.deblock)
 
     # monitoring all resources
     def monitoring(self, interval=1):
@@ -33,6 +35,7 @@ class Kernel:
         while self.is_monitoring:
             self.my_process_manager.resource_monitor()
             self.my_memory_manager.memory_watching()
+            self.my_file_manager.draw_disk_speed()
             sleep(interval)
 
     def report_error(self, cmd, err_msg=''):
@@ -141,7 +144,8 @@ class Kernel:
                     self.my_file_manager.display_storage_status()
 
                 elif tool == 'dms':
-                    self.my_shell.block(func=self.my_memory_manager.display_memory_status)
+                    self.my_memory_manager.display_memory_status()
+                    # self.my_shell.block(func=self.my_memory_manager.display_memory_status)
 
                 elif tool == 'exec':
                     if argc >= 2:
@@ -162,10 +166,12 @@ class Kernel:
                         self.report_error(cmd=tool)
 
                 elif tool == 'ps':
-                    self.my_shell.block(func=self.my_process_manager.process_status)
+                    self.my_process_manager.process_status()
+                    # self.my_shell.block(func=self.my_process_manager.process_status)
 
                 elif tool == 'rs':
-                    self.my_shell.block(func=self.my_process_manager.resource_status)
+                    self.my_process_manager.resource_status()
+                    # self.my_shell.block(func=self.my_process_manager.resource_status)
 
                 elif tool == 'mon':
                     if argc >= 2 and command_split[1] == '-o':
@@ -174,7 +180,9 @@ class Kernel:
                     else:
                         # start monitoring
                         monitor_thread = threading.Thread(target=self.monitoring)
+                        monitor_thread.daemon = True
                         monitor_thread.start()
+
 
                 elif tool == 'td':
                     self.my_file_manager.tidy_disk()
@@ -198,5 +206,8 @@ class Kernel:
 
 
 if __name__ == '__main__':
+    init(autoreset=True)
+    matplotlib.use('Agg')
+
     my_kernel = Kernel()
     my_kernel.run()

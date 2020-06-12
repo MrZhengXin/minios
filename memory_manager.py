@@ -351,7 +351,7 @@ class MemoryManager:
             ax1.plot(self.x, self.virtual_rate, label='virtual', c='b')
         ax1.legend(['physical', 'virtual'], loc=1)
 
-        physical_memory = pd.DataFrame(self.physical_history, columns=['#frame 0', '#frame 1', '#frame 2'])
+        physical_memory = pd.DataFrame(self.physical_history, columns=['#frame %d' % i for i in range(self.ppn)])
 
         physical_memory = pd.DataFrame(physical_memory.values.T, index=physical_memory.columns,
                                        columns=self.x)
