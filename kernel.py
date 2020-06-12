@@ -1,6 +1,5 @@
 import signal
 from time import sleep
-
 from shell import Shell
 from file_manager import FileManager
 from memory_manager import MemoryManager
@@ -16,14 +15,9 @@ class Kernel:
         self.my_file_manager = FileManager()
         self.my_memory_manager = MemoryManager(mode=memory_management_mode,
                                                page_size=memory_page_size,
-                                               page_number=memory_page_number)
-        self.my_process_manager = ProcessManager(self.my_memory_manager,
-                                                 priority=True,
-                                                 preemptive=False,
-                                                 time_slot=1,
-                                                 printer_num=1)
-
-
+                                               page_number=memory_page_number,
+                                               physical_page=memory_physical_page_number)
+        self.my_process_manager = ProcessManager(self.my_memory_manager, priority, preemptive, time_slot, cpu_num, printer_num)
 
         self.is_monitoring = False
         # start process manager
@@ -32,7 +26,7 @@ class Kernel:
 
         signal.signal(signal.SIGINT, self.my_shell.deblock)
 
-
+    # monitoring all resources
     def monitoring(self, interval=1):
         self.is_monitoring = True
         self.my_file_manager.disk.disk_monitoring = True
@@ -40,7 +34,6 @@ class Kernel:
             self.my_process_manager.resource_monitor()
             self.my_memory_manager.memory_watching()
             sleep(interval)
-
 
     def report_error(self, cmd, err_msg=''):
         print('[error %s] %s' % (cmd, err_msg))
@@ -58,10 +51,12 @@ class Kernel:
             # 'mkf': 'make file, format: mkf path',
             'dss': 'display storage status, format: dss',
             'dms': 'display memory status, format: dms',
-            'exec': 'execute file, format: exec path',
+            'exec': 'execute file, format: exec path, e.g. exec test',
+            'chmod': 'change mode of file, format: chmod path new_mode, e.g. chmod test erwx',
             'ps': 'display process status, format: ps',
             'rs': 'display resource status, format: rs',
             'mon': 'start monitoring system resources, format: mon [-o], use -o to stop',
+            'td': 'tidy and defragment your disk, format: td',
             'kill': 'kill process, format: kill pid',
             'exit': 'exit MiniOS'
         }
@@ -163,8 +158,6 @@ class Kernel:
                             my_file = self.my_file_manager.get_file(file_path=path)
                             if my_file:
                                 self.my_process_manager.create_process(file=my_file)
-
-
                     else:
                         self.report_error(cmd=tool)
 
@@ -182,6 +175,9 @@ class Kernel:
                         # start monitoring
                         monitor_thread = threading.Thread(target=self.monitoring)
                         monitor_thread.start()
+
+                elif tool == 'td':
+                    self.my_file_manager.tidy_disk()
 
                 elif tool == 'kill':
                     if argc >= 2:

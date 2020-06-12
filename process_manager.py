@@ -33,7 +33,7 @@ class ProcessControlBlock:
 
 
 class ProcessManager:
-    def __init__(self, memory_manager, priority=True, preemptive=False, time_slot=1, printer_num=2):
+    def __init__(self, memory_manager, priority=True, preemptive=False, time_slot=1, cpu_num=1, printer_num=1):
         self.cur_pid = 0
         self.priority = priority
         self.preemptive = preemptive
@@ -311,7 +311,6 @@ class ProcessManager:
 
         plt.savefig('cpu_and_printer.jpg')
         # print('Figure saved at resource_monitor.png')
-
 
     def input(self):
         while True:
