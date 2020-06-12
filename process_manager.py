@@ -157,6 +157,7 @@ class ProcessManager:
                     self.waiting_queue.remove(pid)
                 elif status == 'waiting(Printer)':
                     self.release(pid)
+                self.memory_manager.free(pid)
                 # print('kill: kill %d success' % pid)
 
         else:
@@ -247,6 +248,7 @@ class ProcessManager:
                     if self.pcb_list[pid].command_queue != []:
                         self.ready_queue[p].append(pid)
                     else:
+                        self.memory_manager.free(pid)
                         sys.stdout.write('\033[2K\033[1G')  # avoid \$ [pid #1] finish!
                         print("[pid #%d] finish!" % self.pid)
                         self.pcb_list[pid].status = 'terminated'

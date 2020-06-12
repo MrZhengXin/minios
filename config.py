@@ -1,8 +1,8 @@
 # config about memory
 memory_management_mode = 'p'
 memory_page_size = 1024
-memory_page_number = 8
-memory_physical_page_number = 4
+memory_page_number = 16
+memory_physical_page_number = 8
 
 # config about process scheduling
 priority = True

@@ -207,7 +207,7 @@ class MemoryManager:
                 else:
                     self.hole.append([base_address, size])
         if status != 1:
-            print("Error! the memory doesn't exist!")
+            print("error: the memory does not exist")
             return False
         for i in range(len(delete) - 1, -1, -1):
             self.r.pop(delete[i])
@@ -215,7 +215,7 @@ class MemoryManager:
 
     # find the aiming page and delete it from page table
     def page_free(self, pid, aid):
-        print('chenbin: debug', 'pid', pid, 'aid', aid)
+        # print('chenbin: debug', 'pid', pid, 'aid', aid)
         status = 0
         for i in range(self.pn):
             if self.virtual_memory[i][1] == pid and (self.virtual_memory[i][2] == aid or aid is None):
@@ -235,7 +235,7 @@ class MemoryManager:
                 self.virtual_memory[i][2] = 0
 
         if status == 0:
-            print("error! That memory not Found.")
+            # print("error! That memory not Found.")
             return False
         return True
 
@@ -247,7 +247,7 @@ class MemoryManager:
         self.page_access += 1  # plus 1 every time you access a page
         page_offset = address % self.ps  # the offset within the page
 
-        print('chenbin: debug', 'pid', pid, 'address', address)
+        # print('chenbin: debug', 'pid', pid, 'address', address)
 
         ptable = self.page_tables[pid]  # get the page table to be visited
         virtual_pageID = ptable.transform(address, self.ps)  # calculate the exact page to be visited
