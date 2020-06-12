@@ -35,7 +35,7 @@ class Shell:
         # print(commands)
         return commands
 
-    def deblock(self, *args):
+    def deblock(self):
         self.block_flag = False
 
     def block(self, func, interval=1):

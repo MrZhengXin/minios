@@ -6,9 +6,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 class Block:
     def __init__(self, total_space, loc):
-
         self.total_space = total_space
         self.free_space = total_space
         self.fp = None
@@ -31,7 +31,6 @@ class Block:
 
 
 class FileManager:
-
     file_separator = os.sep
     root_path = os.getcwd() + file_separator + 'MiniOS_files'  # Win下为\, linux下需要修改!
 
@@ -54,6 +53,7 @@ class FileManager:
 
         self.disk = Disk()
 
+
     # load file into disk if success, return first block(linked list), else
     # report err
     def load(self, file):
@@ -64,9 +64,9 @@ class FileManager:
 
     # 展示函数, 调用时无任何文件打开, 但会模拟访存, 用预设的文件块
     # 能明显体现出各寻道算法的优劣.
-    def get_file_demo(self,seek_algo = 'FCFS'):
-        seek_queue = [(98, 3), (183, 5), (37, 2), (122, 11), (119,5), (14, 0),
-                      (124, 8), (65, 5), (67, 1), (198,5), (105, 5), (53,3)]
+    def get_file_demo(self, seek_algo='FCFS'):
+        seek_queue = [(98, 3), (183, 5), (37, 2), (122, 11), (119, 5), (14, 0),
+                      (124, 8), (65, 5), (67, 1), (198, 5), (105, 5), (53, 3)]
         if seek_algo == 'FCFS':
             self.disk.FCFS(seek_queue)
         elif seek_algo == 'SSTF':
@@ -80,10 +80,9 @@ class FileManager:
         elif seek_algo == 'C_LOOK':
             self.disk.C_LOOK(seek_queue)
         else:
-            print(
-                "get_file: cannot get file. '" + seek_algo + "' no such disk seek algorithm")
+            print("get_file: cannot get file. '" + seek_algo + "' no such disk seek algorithm")
 
-    def get_file(self, file_path, mode='r', seek_algo = 'FCFS'):
+    def get_file(self, file_path, mode='r', seek_algo='FCFS'):
         # 由于open()能完成绝大多数工作, 该函数的主要功能体现在排除异常:
         (upper_path, basename) = self.path_split(file_path)
         current_working_dict = self.path2dict(upper_path)
@@ -102,7 +101,6 @@ class FileManager:
                     else:
                         gf_path = self.root_path + file_path
 
-
                     seek_queue = self.fp2loc(file_path)
                     if seek_algo == 'FCFS':
                         self.disk.FCFS(seek_queue)
@@ -117,8 +115,7 @@ class FileManager:
                     elif seek_algo == 'C_LOOK':
                         self.disk.C_LOOK(seek_queue)
                     else:
-                        print(
-                            "get_file: cannot get file '" +
+                        print("get_file: cannot get file '" +
                             basename +
                             "': '" + seek_algo + "' no such disk seek algorithm")
                     # 未解决异常! 直接把形参mode丢到open()了.
@@ -126,15 +123,13 @@ class FileManager:
                     # print("get_file success")
                     return json.load(f)
                 else:
-                    print(
-                        "get_file: cannot get file'" +
-                        basename +
-                        "': dir not a common file")
+                    print("get_file: cannot get file'" +
+                          basename +
+                          "': dir not a common file")
             else:
-                print(
-                    "get_file: cannot get file'" +
-                    basename +
-                    "': file not exist")
+                print("get_file: cannot get file'" +
+                      basename +
+                      "': file not exist")
 
         return False
 
@@ -328,12 +323,12 @@ class FileManager:
                 if mode == '-l' or mode == '-al':
                     print(current_working_dict, '\t', '\033[1;32m' + basename + '\033[0m')
                 else:
-                    print('\033[1;32m' + basename + '\033[0m', '\t', end = '')
+                    print('\033[1;32m' + basename + '\033[0m', '\t', end='')
             else:
                 if mode == '-l' or mode == '-al':
                     print(current_working_dict, '\t', basename)
                 else:
-                    print(basename, '\t', end = '')
+                    print(basename, '\t', end='')
         # ls的对象是一个文件夹，则显示文件夹内部的信息
         else:
             file_list = current_working_dict.keys()
@@ -384,7 +379,7 @@ class FileManager:
             # '..'指向上一级
             elif dir_path == '..':
                 self.current_working_path = self.current_working_path.rsplit(self.file_separator, 2)[
-                    0] + self.file_separator
+                                                0] + self.file_separator
             # 参数为"\"(根目录), 由于根目录无上级目录, 无法完成下一个分支中的操作, 故在这个分支中单独操作.
             elif dir_path == os.sep:
                 self.current_working_path = os.sep
@@ -400,10 +395,10 @@ class FileManager:
                         else:
                             self.current_working_path = dir_path + self.file_separator
                         # print('cd ' + self.current_working_path + ' success')
-            # 异常1 文件存在但不是目录
+                    # 异常1 文件存在但不是目录
                     else:
                         print('cd: error ' + basename + ': Not a dir')
-            # 异常2 文件不存在
+                # 异常2 文件不存在
                 except BaseException:
                     print('cd: error ' + basename + ': No such dir')
 
@@ -417,10 +412,9 @@ class FileManager:
         else:
             # 异常2 文件已存在
             if basename in current_working_dict:
-                print(
-                    "mkdir: cannot create directory '" +
-                    basename +
-                    "': File exists")
+                print("mkdir: cannot create directory '" +
+                      basename +
+                      "': File exists")
             else:
                 # 相对路径
                 if dir_path[0] != self.file_separator:
@@ -468,7 +462,7 @@ class FileManager:
                 # 同时修改文件树
                 current_working_dict[basename] = file_type
                 print("mkf success")
-        # 异常2 文件已存在
+            # 异常2 文件已存在
             else:
                 print("mkf: cannot create file'" + basename + "': file exists")
 
@@ -551,13 +545,13 @@ class FileManager:
                             os.remove(rm_path)
                             # 同时修改文件树
                             current_working_dict.pop(basename)
-                # 异常1 文件只读, 不可删除
+                        # 异常1 文件只读, 不可删除
                         else:
                             print(
                                 "rm: cannot remove '" +
                                 basename +
                                 "': file read only, try to use -f option")
-                # 异常2 文件不存在
+                    # 异常2 文件不存在
                     else:
                         print(
                             "rm: cannot remove '" +
@@ -594,7 +588,7 @@ class FileManager:
                     f_out.close()
                     current_working_dict[basename] = file_type
                     print("chmod success")
-            # 异常1 文件是目录
+                # 异常1 文件是目录
                 else:
                     print(
                         "chmod: cannot change mode '" +
@@ -649,10 +643,10 @@ class FileManager:
                                                                     occupy, self.block_size, str(b.get_fp())))
 
     # nowheadpointer 某次访存开始时磁头所在磁道号.
-    def set_disk_now_headpointer(self, now_headpointer = 0):
+    def set_disk_now_headpointer(self, now_headpointer=0):
         self.disk.set_now_headpointer(now_headpointer)
 
-    def set_disk_x_slow(self, x_slow = 10):
+    def set_disk_x_slow(self, x_slow=10):
         self.disk.set_x_slow(x_slow)
 
     # 画出过去所有读写磁盘操作时的平均速度柱状图
@@ -661,7 +655,7 @@ class FileManager:
 
 
 class Disk:
-    def __init__(self, now_headpointer = 53, x_slow = 10):
+    def __init__(self, now_headpointer=53, x_slow=10):
         # 扇区大小 默认512byte
         self.sector_size = 512
         # 每磁道中扇区数 默认12
@@ -690,13 +684,16 @@ class Disk:
         self.speed_list = []
         self.algo_list = []
 
+        # 2020.6.12 陈斌添加：为True则会输出图片到本地
+        self.disk_monitoring = False
+
     # 提供两个可修改参数,
     # nowheadpointer 某次访存开始时磁头所在磁道号.
-    def set_now_headpointer(self,now_headpointer = 53):
+    def set_now_headpointer(self, now_headpointer=53):
         self.now_headpointer = now_headpointer
 
     #  x_slow为减速倍数, 让稍纵即逝的读文件过程变得缓慢, 推荐以及默认设置为10倍
-    def set_x_slow(self,x_slow=10):
+    def set_x_slow(self, x_slow=10):
         # x_slow是减速倍数，由于time.sleep()精确到10ms级, 故默认放慢100倍
         self.x_slow = x_slow
         self.seek_speed = self.seek_speed * x_slow
@@ -729,20 +726,21 @@ class Disk:
             this_time_byte = this_time_byte + self.sector_size
         self.total_time = self.total_time + this_time_time
         self.total_byte = self.total_byte + this_time_byte
-        print("disk access success: time used: ", round(this_time_time * 1000,5), "ms")
+        print("disk access success: time used: ", round(this_time_time * 1000, 5), "ms")
         self.total_speed_list.append(self.total_byte / self.total_time)
         self.speed_list.append(this_time_byte / this_time_time)
 
-
     # 先来先服务
-    def FCFS(self,seek_queue):
+    def FCFS(self, seek_queue):
         self.seek_by_queue(seek_queue)
         self.algo_list.append('FCFS')
-        self.draw_track(seek_queue,"FCFS")
+        if self.disk_monitoring:
+            self.draw_track(seek_queue, "FCFS")
+
     # 最短寻道时间优先
-    def SSTF(self,seek_queue):
+    def SSTF(self, seek_queue):
         # 暂存经过SSTF排序后的seek_queue
-        temp_seek_queue = [(self.now_headpointer,0)]
+        temp_seek_queue = [(self.now_headpointer, 0)]
         while seek_queue:
             min_track_distance = self.track_num
             for seek_addr in seek_queue:
@@ -758,13 +756,14 @@ class Disk:
 
         self.seek_by_queue(seek_queue)
         self.algo_list.append('SSTF')
-        self.draw_track(seek_queue, "SSTF")
+        if self.disk_monitoring:
+            self.draw_track(seek_queue, "SSTF")
 
     # 先正向扫描,扫到头,再负向扫描
-    def SCAN(self,seek_queue):
+    def SCAN(self, seek_queue):
         # 暂存经过SCAN方法排序后的seek_queue
         temp_seek_queue = []
-        seek_queue.sort(key = lambda item: item[0])
+        seek_queue.sort(key=lambda item: item[0])
         for loc in range(len(seek_queue)):
             if seek_queue[loc][0] >= self.now_headpointer:
                 break
@@ -774,19 +773,20 @@ class Disk:
         if temp_seek_queue == seek_queue:
             pass
         else:
-            temp_seek_queue.append((self.track_num-1,-1))
+            temp_seek_queue.append((self.track_num - 1, -1))
             # 比now_headpointer小的部分,负序访问
             temp_seek_queue.extend(seek_queue[loc - 1::-1])
             seek_queue = temp_seek_queue
         self.seek_by_queue(seek_queue)
         self.algo_list.append('SCAN')
-        self.draw_track(seek_queue, "SCAN")
+        if self.disk_monitoring:
+            self.draw_track(seek_queue, "SCAN")
 
     # 先正向扫描,扫到头,归0,再正向扫描
-    def C_SCAN(self,seek_queue):
+    def C_SCAN(self, seek_queue):
         # 暂存经过C_SCAN方法排序后的seek_queue
         temp_seek_queue = []
-        seek_queue.sort(key = lambda item: item[0])
+        seek_queue.sort(key=lambda item: item[0])
         for loc in range(len(seek_queue)):
             if seek_queue[loc][0] >= self.now_headpointer:
                 break
@@ -797,7 +797,7 @@ class Disk:
             pass
         else:
             # 走到头
-            temp_seek_queue.append((self.track_num-1,-1))
+            temp_seek_queue.append((self.track_num - 1, -1))
             # 归零
             temp_seek_queue.append((0, -1))
             # 比now_headpointer小的部分,负序访问
@@ -805,13 +805,14 @@ class Disk:
             seek_queue = temp_seek_queue
         self.seek_by_queue(seek_queue)
         self.algo_list.append('C_SCAN')
-        self.draw_track(seek_queue, "C_SCAN")
+        if self.disk_monitoring:
+            self.draw_track(seek_queue, "C_SCAN")
 
     # 先正向扫描,不扫到头,再负向扫描
-    def LOOK(self,seek_queue):
+    def LOOK(self, seek_queue):
         # 暂存经过LOOK排序后的seek_queue
         temp_seek_queue = []
-        seek_queue.sort(key = lambda item: item[0])
+        seek_queue.sort(key=lambda item: item[0])
         for loc in range(len(seek_queue)):
             if seek_queue[loc][0] >= self.now_headpointer:
                 break
@@ -826,13 +827,14 @@ class Disk:
 
         self.seek_by_queue(seek_queue)
         self.algo_list.append('LOOK')
-        self.draw_track(seek_queue, "LOOK")
+        if self.disk_monitoring:
+            self.draw_track(seek_queue, "LOOK")
 
     # 先正向扫描,不扫到头,归0,再正向扫描
     def C_LOOK(self, seek_queue):
         # 暂存经过C_LOOK方法排序后的seek_queue
         temp_seek_queue = []
-        seek_queue.sort(key = lambda item: item[0])
+        seek_queue.sort(key=lambda item: item[0])
         for loc in range(len(seek_queue)):
             if seek_queue[loc][0] >= self.now_headpointer:
                 break
@@ -843,7 +845,8 @@ class Disk:
         seek_queue = temp_seek_queue
         self.seek_by_queue(seek_queue)
         self.algo_list.append('C_LOOK')
-        self.draw_track(seek_queue, "C_LOOK")
+        if self.disk_monitoring:
+            self.draw_track(seek_queue, "C_LOOK")
 
     def draw_disk_speed(self):
         ax = plt.subplot()
@@ -851,11 +854,12 @@ class Disk:
         plt.ylabel('speed: MB/s')
         index = range(len(self.speed_list))
         speed_list_MB = np.array(self.speed_list) / 1000
-        plt.bar(index, speed_list_MB, color="#87CEFA",width = 0.35)
+        plt.bar(index, speed_list_MB, color="#87CEFA", width=0.35)
         plt.xticks(index, self.algo_list)
-        plt.show()
+        plt.savefig('disk.jpg')
+        # plt.show()
 
-    def draw_track(self,seek_queue,algo):
+    def draw_track(self, seek_queue, algo):
         track_queue = []
         for seek_addr in seek_queue:
             track_queue.append(seek_addr[0])
@@ -867,13 +871,11 @@ class Disk:
         ax.spines["top"].set_visible(False)
         ax.spines["bottom"].set_visible(False)
         plt.xticks([])
-        plt.plot(track_queue, marker = '>', mec='r', mfc='w', color = 'k')
+        plt.plot(track_queue, marker='>', mec='r', mfc='w', color='k')
         for i in range(len(track_queue)):
-            plt.text(i,track_queue[i],track_queue[i])
+            plt.text(i, track_queue[i], track_queue[i])
         plt.title(algo + " track")
-        plt.show()
-
-
+        plt.savefig('last_track.jpg')
 
 
 if __name__ == '__main__':
@@ -899,21 +901,15 @@ if __name__ == '__main__':
     # a.draw_disk_speed()
 
     a.set_disk_now_headpointer(53)
-    a.get_file_demo(seek_algo = 'FCFS')
+    a.get_file_demo(seek_algo='FCFS')
     a.set_disk_now_headpointer(53)
-    a.get_file_demo(seek_algo = 'SSTF')
+    a.get_file_demo(seek_algo='SSTF')
     a.set_disk_now_headpointer(53)
-    a.get_file_demo(seek_algo = 'SCAN')
+    a.get_file_demo(seek_algo='SCAN')
     a.set_disk_now_headpointer(53)
-    a.get_file_demo(seek_algo = 'C_SCAN')
+    a.get_file_demo(seek_algo='C_SCAN')
     a.set_disk_now_headpointer(53)
-    a.get_file_demo(seek_algo = 'LOOK')
+    a.get_file_demo(seek_algo='LOOK')
     a.set_disk_now_headpointer(53)
-    a.get_file_demo(seek_algo = 'C_LOOK')
+    a.get_file_demo(seek_algo='C_LOOK')
     a.draw_disk_speed()
-
-
-
-
-
-

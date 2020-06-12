@@ -268,8 +268,8 @@ class MemoryManager:
         elif -1 in self.physical_memory:  # the memory is still available
             self.physical_memory[self.physical_memory.index(-1)] = pnum
             self.physicalsize += self.virtual_memory[pnum][0]
-            self.schedule_queue.append(pnum)   # enlarge queue
-            ptable.modify(pnum, self.physical_memory.index(pnum), 1)   # modify the page table
+            self.schedule_queue.append(pnum)  # enlarge queue
+            ptable.modify(pnum, self.physical_memory.index(pnum), 1)  # modify the page table
             self.page_fault += 1  # page_fault ++
 
         else:  # switch page
@@ -277,9 +277,9 @@ class MemoryManager:
             self.physical_memory[index] = pnum
             pid = self.virtual_memory[self.schedule_queue[0]][2]
 
-            self.physicalsize -= self.virtual_memory[self.schedule_queue[0]][0]    # modify the physical memory status
+            self.physicalsize -= self.virtual_memory[self.schedule_queue[0]][0]  # modify the physical memory status
             self.physicalsize += self.virtual_memory[pnum][0]
-            self.page_fault += 1   # page_fault ++
+            self.page_fault += 1  # page_fault ++
 
             p1 = self.page_tables[pid]  # change the page table and modify the queue
             p1.modify(self.schedule_queue[0], 0, -1)
@@ -308,7 +308,7 @@ class MemoryManager:
                                                                                              self.r[i][2],
                                                                                              self.r[i][3]))
 
-    def MemoryWatcher(self):
+    def memory_watching(self):
         self.physical_rate.append(self.physicalsize / (self.ps * self.ppn))
         self.virtual_rate.append(self.allocated / self.total)
         if len(self.x) < 10:
@@ -328,7 +328,12 @@ class MemoryManager:
         f, (ax1, ax2) = plt.subplots(figsize=(6, 10), nrows=2)
 
         ax1.set_xticks(self.x)
-        ax1.set_title('%.2f memory access, page_fault rate %.2f' % (self.page_access, self.page_fault/self.page_access))
+
+        # fixed a bug: divided by zero
+        page_fault_rate = 0.0 if self.page_access == 0 else self.page_fault / self.page_access
+
+        ax1.set_title('%.2f memory access, page_fault rate %.2f' % (self.page_access, page_fault_rate))
+
         if len(self.physical_rate) > 10:
             ax1.plot(self.x, self.physical_rate[-10:], label='physical', c='r')
             ax1.plot(self.x, self.virtual_rate[-10:], label='virtual', c='b')
@@ -346,8 +351,8 @@ class MemoryManager:
                         linewidths=0.5, robust=True)
 
         plt.tight_layout()
-        plt.savefig('watch%d' % self.x[-1])
-        plt.show()
+        plt.savefig('memory.jpg')
+        # plt.show()
 
 
 if __name__ == '__main__':
@@ -358,34 +363,34 @@ if __name__ == '__main__':
     mm.display_memory_status()
     t1 = mm.alloc(2, 1094)
     mm.access(1, 1024)
-    mm.MemoryWatcher()
+    mm.memory_watching()
     mm.access(1, 150)
-    mm.MemoryWatcher()
+    mm.memory_watching()
     mm.access(1, 890)
-    mm.MemoryWatcher()
+    mm.memory_watching()
     mm.access(2, 1000)
-    mm.MemoryWatcher()
+    mm.memory_watching()
     mm.access(1, 1999)
-    mm.MemoryWatcher()
+    mm.memory_watching()
     mm.display_memory_status()
     mm.free(2, t1)
-    mm.MemoryWatcher()
+    mm.memory_watching()
     mm.alloc(3, 2456)
-    mm.MemoryWatcher()
+    mm.memory_watching()
     mm.access(3, 2000)
-    mm.MemoryWatcher()
+    mm.memory_watching()
     mm.access(0, 100)
-    mm.MemoryWatcher()
+    mm.memory_watching()
     mm.access(2, 1030)
-    mm.MemoryWatcher()
+    mm.memory_watching()
     mm.display_memory_status()
-    mm.MemoryWatcher()
+    mm.memory_watching()
     t2 = mm.alloc(1, 120)
-    mm.MemoryWatcher()
+    mm.memory_watching()
     mm.display_memory_status()
-    mm.MemoryWatcher()
+    mm.memory_watching()
     mm.alloc(1, 200)
-    mm.MemoryWatcher()
+    mm.memory_watching()
     mm.free(1, t2)
-    mm.MemoryWatcher()
+    mm.memory_watching()
     mm.display_memory_status()

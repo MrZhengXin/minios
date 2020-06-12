@@ -1,18 +1,14 @@
 # coding=UTF-8
 import time
-import json
 import threading
 import sys
 import copy
 from hardware_resource import HardwareResource
 import matplotlib.pyplot as plt
 import seaborn as sns
-import pandas as pd
-
 
 
 # 5 status of process: running, waiting, ready,terminated, waiting(Printer)
-
 # A large number means high priority
 
 # PCB
@@ -32,8 +28,10 @@ class ProcessControlBlock:
         self.status = "ready"
 
 
+
+
 class ProcessManager:
-    def __init__(self, priority=True, preemptive=False, time_slot=1, printer_num=2):
+    def __init__(self, memory_manager, priority=True, preemptive=False, time_slot=1, printer_num=2):
         self.cur_pid = 0
         self.priority = priority
         self.preemptive = preemptive
@@ -47,6 +45,10 @@ class ProcessManager:
         self.resources_history = {i:[] for i in self.devices}
         self.history_length = 14.0
         self.running = False
+
+        self.pid_to_aid = {}
+
+        self.memory_manager = memory_manager
         # 2 queues, ready queue, waiting queue
         # at most 1 process is running
 
@@ -61,18 +63,24 @@ class ProcessManager:
         sys.stdout.write('\033[2K\033[1G')  # avoid \$ [pid #1] finish!
         print("[pid %d] process forked successfully by [pid %d]" % (self.cur_pid, self.current_running))
         self.cur_pid += 1
+
         return self.cur_pid
 
 
     # 2020.6.9 陈斌：判断是可执行的文件类型，才创建进程，否则提示错误
     def create_process(self, file):
         if file['type'][0] == 'e':
-            self.pcb_list.append(ProcessControlBlock(self.cur_pid, 0, time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
-                                                     file['name'], file['priority'], file['content']))  # ppid of process created by OS is 0
-            self.ready_queue[file['priority']].append(self.cur_pid)
-            print("[pid %d] process created successfully" % self.cur_pid)
-            self.cur_pid += 1
-            return self.cur_pid
+            my_aid = self.memory_manager.alloc(pid=self.cur_pid, size=int(file['size']))
+            if my_aid == -1:
+                self.pcb_list.append(ProcessControlBlock(self.cur_pid, 0, time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
+                                                         file['name'], file['priority'], file['content']))  # ppid of process created by OS is 0
+                self.ready_queue[file['priority']].append(self.cur_pid)
+                print("[pid %d] process created successfully" % self.cur_pid)
+                self.cur_pid += 1
+                self.pid_to_aid[self.cur_pid] = my_aid
+                return self.cur_pid
+            else:
+                print('create new process failed: no enough memory')
         else:
             print('error:', file['name'], 'is not executable')
 
@@ -144,7 +152,7 @@ class ProcessManager:
                     self.waiting_queue.remove(pid)
                 elif status == 'waiting(Printer)':
                     self.release(pid)
-                print('kill: kill %d success' % pid)
+                # print('kill: kill %d success' % pid)
 
         else:
             print('kill: kill %d failed: no such process' % pid)
@@ -283,8 +291,8 @@ class ProcessManager:
                 linewidths=0.5, robust=True, cmap='YlGnBu', vmin = 0, vmax = 1.0)
         plt.tight_layout()            
 
-        plt.savefig('resource_monitor.png')
-        print('Figure saved at resource_monitor.png')
+        plt.savefig('cpu_and_printer.jpg')
+        # print('Figure saved at resource_monitor.png')
 
 
     def input(self):

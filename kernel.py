@@ -1,4 +1,6 @@
 import signal
+from time import sleep
+
 from shell import Shell
 from file_manager import FileManager
 from memory_manager import MemoryManager
@@ -15,19 +17,30 @@ class Kernel:
         self.my_memory_manager = MemoryManager(mode=memory_management_mode,
                                                page_size=memory_page_size,
                                                page_number=memory_page_number)
-        self.my_process_manager = ProcessManager(priority=True,
+        self.my_process_manager = ProcessManager(self.my_memory_manager,
+                                                 priority=True,
                                                  preemptive=False,
                                                  time_slot=1,
                                                  printer_num=1)
 
-        self.pid_to_aid = {}
 
+
+        self.is_monitoring = False
         # start process manager
         self.my_process_manager_run_thread = threading.Thread(target=self.my_process_manager.run)
         self.my_process_manager_run_thread.start()
 
-        # 设置 ctrl + c 安全退出，指向函数 exit_safely
         signal.signal(signal.SIGINT, self.my_shell.deblock)
+
+
+    def monitoring(self, interval=1):
+        self.is_monitoring = True
+        self.my_file_manager.disk.disk_monitoring = True
+        while self.is_monitoring:
+            self.my_process_manager.resource_monitor()
+            self.my_memory_manager.memory_watching()
+            sleep(interval)
+
 
     def report_error(self, cmd, err_msg=''):
         print('[error %s] %s' % (cmd, err_msg))
@@ -48,6 +61,7 @@ class Kernel:
             'exec': 'execute file, format: exec path',
             'ps': 'display process status, format: ps',
             'rs': 'display resource status, format: rs',
+            'mon': 'start monitoring system resources, format: mon [-o], use -o to stop',
             'kill': 'kill process, format: kill pid',
             'exit': 'exit MiniOS'
         }
@@ -148,9 +162,8 @@ class Kernel:
                         for path in path_list:
                             my_file = self.my_file_manager.get_file(file_path=path)
                             if my_file:
-                                my_pid = self.my_process_manager.create_process(file=my_file)
-                                my_aid = self.my_memory_manager.alloc(pid=my_pid, size=int(my_file['size']))
-                                self.pid_to_aid[my_pid] = my_aid
+                                self.my_process_manager.create_process(file=my_file)
+
 
                     else:
                         self.report_error(cmd=tool)
@@ -162,7 +175,13 @@ class Kernel:
                     self.my_shell.block(func=self.my_process_manager.resource_status)
 
                 elif tool == 'mon':
-                    self.my_shell.block(func=self.my_process_manager.resource_monitor)
+                    if argc >= 2 and command_split[1] == '-o':
+                        self.is_monitoring = False
+                        self.my_file_manager.disk.disk_monitoring = False
+                    else:
+                        # start monitoring
+                        monitor_thread = threading.Thread(target=self.monitoring)
+                        monitor_thread.start()
 
                 elif tool == 'kill':
                     if argc >= 2:
