@@ -323,12 +323,13 @@ class FileManager:
                 if mode == '-l' or mode == '-al':
                     print(current_working_dict, '\t', '\033[1;32m' + basename + '\033[0m')
                 else:
-                    print('\033[1;32m' + basename + '\033[0m', '\t', end='')
+                    # print('\033[1;32m' + basename + '\033[0m', '\t', end='')
+                    print('\033[1;32m' + basename + '\033[0m')
             else:
                 if mode == '-l' or mode == '-al':
                     print(current_working_dict, '\t', basename)
                 else:
-                    print(basename, '\t', end='')
+                    print(basename)
         # ls的对象是一个文件夹，则显示文件夹内部的信息
         else:
             file_list = current_working_dict.keys()
