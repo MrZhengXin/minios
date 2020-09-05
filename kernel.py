@@ -12,6 +12,9 @@ import os
 import threading
 import matplotlib
 
+init(autoreset=True)
+matplotlib.use('Agg')
+
 
 class Kernel:
     def __init__(self):
@@ -208,8 +211,5 @@ class Kernel:
 
 
 if __name__ == '__main__':
-    init(autoreset=True)
-    matplotlib.use('Agg')
-
     my_kernel = Kernel()
     my_kernel.run()
