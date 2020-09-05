@@ -180,12 +180,12 @@ class Kernel:
 
                 elif tool == 'mon':
                     if argc >= 2 and command_split[1] == '-o':
-                        print('Start monitoring')
+                        print('Stop monitoring')
                         self.is_monitoring = False
                         self.my_file_manager.disk.disk_monitoring = False
                     else:
                         # start monitoring
-                        print('Stop monitoring')
+                        print('Start monitoring')
                         monitor_thread = threading.Thread(target=self.monitoring)
                         monitor_thread.daemon = True
                         monitor_thread.start()
