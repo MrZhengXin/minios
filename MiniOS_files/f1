@@ -6,10 +6,10 @@
     "content": [
         "cpu 1",
         "printer 2",
-		"fork 5",
+		"fork",
 		"access 157",
         "cpu 1",
-		"fork 5",
+		"fork",
 		"access 157",
         "cpu 1"
     ]
