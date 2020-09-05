@@ -1,4 +1,5 @@
-# coding=UTF-8
+# coding=utf-8
+
 import time
 import threading
 import sys

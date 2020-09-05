@@ -1,3 +1,5 @@
+# coding=utf-8
+
 # config about memory
 memory_management_mode = 'p'
 memory_page_size = 1024

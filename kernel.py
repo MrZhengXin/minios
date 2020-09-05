@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import signal
 from colorama import init
 from time import sleep
