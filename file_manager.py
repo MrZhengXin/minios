@@ -148,6 +148,7 @@ class FileManager:
                 part_of_tree[file] = self._init_file_system_tree(file_path)
             else:
                 with open(file_path) as f:  # 普通文件为键, 其值为该文件的属性
+                    print(file_path)
                     data = json.load(f)
                     part_of_tree[file] = data['type']
                     if self.fill_file_into_blocks(
@@ -707,9 +708,11 @@ class Disk:
         # 本次访存的耗时与读写量
         this_time_time = 0
         this_time_byte = 0
+        total_track_distance = 0
         for seek_addr in seek_queue:
             # 寻道:计算磁头所要移动的距离
             track_distance = abs(seek_addr[0] - self.now_headpointer)
+            total_track_distance = total_track_distance + track_distance
             # 寻道:模拟延迟并移动磁头
             time.sleep(track_distance * self.seek_speed)
             # 记录耗时(考虑减速比)
@@ -730,6 +733,7 @@ class Disk:
         self.total_time = self.total_time + this_time_time
         self.total_byte = self.total_byte + this_time_byte
         print("disk access success: time used: ", round(this_time_time * 1000, 5), "ms")
+        # print(total_track_distance)
         self.total_speed_list.append(self.total_byte / self.total_time)
         self.speed_list.append(this_time_byte / this_time_time)
 
@@ -858,6 +862,7 @@ class Disk:
         plt.ylabel('speed: MB/s')
         index = range(len(self.speed_list))
         speed_list_MB = np.array(self.speed_list) / 1000
+        # print(speed_list_MB)
         plt.bar(index, speed_list_MB, color="#87CEFA", width=0.35)
         plt.xticks(index, self.algo_list)
         plt.savefig('disk.jpg')
