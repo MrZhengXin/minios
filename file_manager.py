@@ -148,7 +148,7 @@ class FileManager:
                 part_of_tree[file] = self._init_file_system_tree(file_path)
             else:
                 with open(file_path) as f:  # 普通文件为键, 其值为该文件的属性
-                    print(file_path)
+                    # print(file_path)
                     data = json.load(f)
                     part_of_tree[file] = data['type']
                     if self.fill_file_into_blocks(
