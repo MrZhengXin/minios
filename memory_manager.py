@@ -45,7 +45,7 @@ class PageTable:
 
 
 class MemoryManager:
-    def __init__(self, mode, page_size=1024, page_number=8, physical_page=3, schedule='LRU'):
+    def __init__(self, mode, page_size=1024, page_number=8, physical_page=3, schedule='FIFO'):
         """
         :param mode: to define the way to allocate the memory
         :param page_size: the size of each page(useful when mode == 'p')
@@ -300,13 +300,13 @@ class MemoryManager:
         :param ptable: the ptable records the virtual page
         :return:
         """
-        if ptable.table[pnum] != 1 and -1 in self.physical_memory:
+        if ptable.table[pnum][1] != 1 and -1 in self.physical_memory:
             self.physical_memory[self.physical_memory.index(-1)] = pnum
             self.physicalsize += self.virtual_memory[pnum][0]
             self.schedule_queue.append(pnum)  # enlarge queue
             ptable.modify(pnum, self.physical_memory.index(pnum), 1)  # modify the page table
             self.page_fault += 1  # page_fault ++
-        else:
+        elif ptable.table[pnum][1] != 1:
             index = self.physical_memory.index(self.schedule_queue[0])  # always switch out the first in the queue
             self.physical_memory[index] = pnum
             pid = self.virtual_memory[self.schedule_queue[0]][2]
@@ -366,7 +366,10 @@ class MemoryManager:
         ax1.set_yticks(np.arange(0, 1.1, 0.1))
 
         # fixed a bug: divided by zero
-        page_fault_rate = 0.0 if self.page_access == 0 else self.page_fault / self.page_access
+        if self.page_access == 0:
+            page_fault_rate = 0.0
+        else:
+            page_fault_rate = self.page_fault / self.page_access
 
         ax1.set_title('%.2f memory access, page_fault rate %.2f' % (self.page_access, page_fault_rate))
 
@@ -385,7 +388,7 @@ class MemoryManager:
                                        columns=self.x)
         seaborn.heatmap(data=physical_memory, cbar=None, ax=ax2, annot=True,
                         linewidths=0.5, robust=True)
-
+        print(np.mean(self.physical_rate))
         plt.tight_layout()
         plt.savefig('memory.jpg')
         # plt.show()
