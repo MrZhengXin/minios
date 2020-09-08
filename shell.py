@@ -10,8 +10,7 @@ from time import sleep
 class Shell:
     def __init__(self):
         self.block_flag = False
-        platform_to_clear_cmd = {'Windows': 'cls', 'Linux': 'clear'}
-        self.clear_cmd_str = platform_to_clear_cmd[platform.system()]
+        self.clear_cmd_str = 'cls' if platform.system() == 'Windows' else 'clear'
         self.print_system_info()
                
     def print_system_info(self):
