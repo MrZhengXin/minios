@@ -259,6 +259,8 @@ class MemoryManager:
 
         if self.schedule == 'LRU':
             self.LRU(virtual_pageID, ptable)
+        elif self.schedule == 'FIFO':
+            self.FIFO(virtual_pageID, ptable)
         pass  # more algorithm to be continued
 
     def LRU(self, pnum, ptable):
@@ -291,7 +293,33 @@ class MemoryManager:
             self.schedule_queue.pop(0)
             self.schedule_queue.append(pnum)
             ptable.modify(pnum, index, 1)
-        pass
+
+    def FIFO(self, pnum, ptable):
+        """
+        :param pnum: the virtual page to be switched in physical memory
+        :param ptable: the ptable records the virtual page
+        :return:
+        """
+        if ptable.table[pnum] != 1 and -1 in self.physical_memory:
+            self.physical_memory[self.physical_memory.index(-1)] = pnum
+            self.physicalsize += self.virtual_memory[pnum][0]
+            self.schedule_queue.append(pnum)  # enlarge queue
+            ptable.modify(pnum, self.physical_memory.index(pnum), 1)  # modify the page table
+            self.page_fault += 1  # page_fault ++
+        else:
+            index = self.physical_memory.index(self.schedule_queue[0])  # always switch out the first in the queue
+            self.physical_memory[index] = pnum
+            pid = self.virtual_memory[self.schedule_queue[0]][2]
+
+            self.physicalsize -= self.virtual_memory[self.schedule_queue[0]][0]  # modify the physical memory status
+            self.physicalsize += self.virtual_memory[pnum][0]
+            self.page_fault += 1  # page_fault ++
+
+            p1 = self.page_tables[pid]  # change the page table and modify the queue
+            p1.modify(self.schedule_queue[0], 0, -1)
+            self.schedule_queue.pop(0)
+            self.schedule_queue.append(pnum)
+            ptable.modify(pnum, index, 1)
 
     def page_show(self):
         print('total: %-dB allocated: %-dB free: %-dB' % (self.total, self.allocated,
@@ -381,7 +409,8 @@ if __name__ == '__main__':
     mm.access(1, 1999)
     mm.memory_watching()
     mm.display_memory_status()
-    mm.free(2, t1)
+    # mm.free(2, t1)
+    mm.display_memory_status()
     mm.memory_watching()
     mm.alloc(3, 2456)
     mm.memory_watching()
@@ -394,6 +423,7 @@ if __name__ == '__main__':
     mm.display_memory_status()
     mm.memory_watching()
     t2 = mm.alloc(1, 120)
+    mm.access(1, 1020)
     mm.memory_watching()
     mm.display_memory_status()
     mm.memory_watching()
