@@ -388,7 +388,6 @@ class MemoryManager:
                                        columns=self.x)
         seaborn.heatmap(data=physical_memory, cbar=None, ax=ax2, annot=True,
                         linewidths=0.5, robust=True)
-        print(np.mean(self.physical_rate))
         plt.tight_layout()
         plt.savefig('memory.jpg')
         # plt.show()
