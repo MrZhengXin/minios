@@ -1,16 +1,8 @@
 {
-    "name": "f1",
-    "type": "erwx",
+    "name": "f3",
+    "type": "crw-",
     "size": "233",
-    "priority": 2,
     "content": [
-        "cpu 1",
-        "printer 2",
-		"fork",
-		"access 157",
-        "cpu 1",
-		"fork",
-		"access 157",
-        "cpu 1"
+        null
     ]
 }

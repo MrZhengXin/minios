@@ -53,13 +53,7 @@ class FileManager:
         self.file_system_tree = self._init_file_system_tree(self.root_path)
         self.free_unfillable_block()
 
-        self.disk = Disk()
-
-
-    # load file into disk if success, return first block(linked list), else
-    # report err
-    def load(self, file):
-        pass
+        self.disk = Disk(block_size, tracks, secs)
 
     # return file, if failed, report error and return None.
     # file_path支持绝对路径, mode格式与函数open()约定的相同
@@ -117,21 +111,15 @@ class FileManager:
                     elif seek_algo == 'C_LOOK':
                         self.disk.C_LOOK(seek_queue)
                     else:
-                        print("get_file: cannot get file '" +
-                            basename +
-                            "': '" + seek_algo + "' no such disk seek algorithm")
+                        print("get_file: cannot get file '" + basename + "': '" + seek_algo + "' no such disk seek algorithm")
                     # 未解决异常! 直接把形参mode丢到open()了.
                     f = open(gf_path, mode)
                     # print("get_file success")
                     return json.load(f)
                 else:
-                    print("get_file: cannot get file'" +
-                          basename +
-                          "': dir not a common file")
+                    print("get_file: cannot get file'" + basename + "': dir not a common file")
             else:
-                print("get_file: cannot get file'" +
-                      basename +
-                      "': file not exist")
+                print("get_file: cannot get file'" + basename + "': file not exist")
 
         return False
 
@@ -268,6 +256,7 @@ class FileManager:
         self.all_blocks = self._init_blocks()
         for f in block_dir.items():
             self.fill_file_into_blocks({"size": f[1][2]}, f[0])
+        print('tidy disk complete')
 
     def set_unfillable_block(self):
         for i in self.unfillable_block:
@@ -357,7 +346,7 @@ class FileManager:
                     else:
                         print('\033[1;34m' + file + '\033[0m', '\t', end='')
                 # 可执行文件高亮绿色显示
-                elif current_working_dict[file][3] == 'x':
+                elif current_working_dict[file][0] == 'e':
                     if mode == '-l' or mode == '-al':
                         print(current_working_dict[file], '\t', '\033[1;32m' + file + '\033[0m')
                     else:
@@ -432,6 +421,9 @@ class FileManager:
 
     # command: make file
     def mkf(self, file_path, file_type='crwx', size='233', content=None):
+        if file_type[0] != 'c':
+            print("mkf: cannot create file'" + file_path + "': only common file can be created")
+            return
         (upper_path, basename) = self.path_split(file_path)
         current_working_dict = self.path2dict(upper_path)
         json_text = {
@@ -454,10 +446,7 @@ class FileManager:
                     mkf_path = file_path
                 if self.fill_file_into_blocks(
                         json_text, mkf_path, method=2) == -1:  # 测试是否能装入block
-                    print(
-                        "mkf: cannot create file'" +
-                        basename +
-                        "': No enough Space")
+                    print("mkf: cannot create file'" + basename + "': No enough Space")
                     return
                 mkf_path = self.root_path + mkf_path
                 f = open(mkf_path, 'w')
@@ -530,7 +519,7 @@ class FileManager:
                     print(
                         "rm -r: cannot remove '" +
                         basename +
-                        "': Dir not empty, try to use '-rf'")
+                        "': this directory is not empty, try to use 'rm -rf [path]'")
             # 空参数 或 -f 删文件
             elif mode == '' or mode == '-f':
                 try:
@@ -632,19 +621,15 @@ class FileManager:
         all_free = len(np.nonzero(self.bitmap)[0])
         all_free *= self.block_size  # 剩余的总字节数
         all_occupy = total - all_free  # 已占用的总字节数
-        print(
-            "total: {0} B,\t allocated: {1} B,\t free: {2} B\n".format(
-                total,
-                all_occupy,
-                all_free))
+        print("total: {0} B,\t allocated: {1} B,\t free: {2} B\n".format(total, all_occupy, all_free))
         # for fp, item in self.block_dir.items():  # 调试用
         #     print("{:<10}: start {}\t length {}".format(fp, item[0], item[1]))
         for i in range(self.block_number):
             b = self.all_blocks[i]
             occupy = self.block_size - b.get_free_space()
-            # all_free += b.get_free_space()
-            print("block #{:<5} {:>5} / {} Byte(s)   {:<20}".format(i,
-                                                                    occupy, self.block_size, str(b.get_fp())))
+            if occupy > 0:
+                # all_free += b.get_free_space()
+                print("block #{:<5} {:>5} / {} Byte(s)   {:<20}".format(i, occupy, self.block_size, str(b.get_fp())))
 
     # nowheadpointer 某次访存开始时磁头所在磁道号.
     def set_disk_now_headpointer(self, now_headpointer=0):
@@ -659,13 +644,13 @@ class FileManager:
 
 
 class Disk:
-    def __init__(self, now_headpointer=53, x_slow=10):
+    def __init__(self, block_size, track_num, sec_num, now_headpointer=53, x_slow=10):
         # 扇区大小 默认512byte
-        self.sector_size = 512
+        self.sector_size = block_size
         # 每磁道中扇区数 默认12
-        self.track_size = 12
+        self.track_size = sec_num
         # 总磁道数 默认200
-        self.track_num = 200
+        self.track_num = track_num
         # 当前磁头所在磁道号
         self.now_headpointer = now_headpointer
 

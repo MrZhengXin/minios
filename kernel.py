@@ -12,14 +12,11 @@ import os
 import threading
 import matplotlib
 
-init(autoreset=True)
-matplotlib.use('Agg')
-
 
 class Kernel:
     def __init__(self):
         self.my_shell = Shell()
-        self.my_file_manager = FileManager()
+        self.my_file_manager = FileManager(storage_block_size, storage_track_num, storage_sec_num)
         self.my_memory_manager = MemoryManager(mode=memory_management_mode,
                                                page_size=memory_page_size,
                                                page_number=memory_page_number,
@@ -52,11 +49,11 @@ class Kernel:
     def display_command_description(self, cmd_list):
         command_to_description = {
             'man': 'manual page, format: man [command1] [command2] ...',
-            'ls': 'list directory contents, format: ls [-a|-l|-al][path]',
+            'ls': 'list directory contents, format: ls [-a|-l|-al] [path]',
             'cd': 'change current working directory, format: cd [path]',
             'rm': 'remove file or directory recursively, format: rm [-r|-f|-rf] path',
-            'mkdir': 'make directory, format: mkdir path',
-            # 'mkf': 'make file, format: mkf path',
+            'mkdir': 'create directory, format: mkdir path',
+            'mkf': 'create common file, format: mkf path type size, e.g. mkf my_file crwx 300',
             'dss': 'display storage status, format: dss',
             'dms': 'display memory status, format: dms',
             'exec': 'execute file, format: exec path, e.g. exec test',
@@ -71,7 +68,10 @@ class Kernel:
         if len(cmd_list) == 0:
             cmd_list = command_to_description.keys()
         for cmd in cmd_list:
-            print(cmd, '-', command_to_description[cmd])
+            if cmd in command_to_description.keys():
+                print(cmd, '-', command_to_description[cmd])
+            else:
+                self.report_error(cmd=cmd, err_msg='no such command')
 
     def run(self):
         while True:
@@ -135,7 +135,12 @@ class Kernel:
                     if argc >= 3:
                         self.my_file_manager.chmod(file_path=command_split[1], file_type=command_split[2])
                     else:
-                        print(command_split)
+                        self.report_error(cmd=tool)
+
+                elif tool == 'mkf':
+                    if argc >= 4:
+                        self.my_file_manager.mkf(file_path=command_split[1], file_type=command_split[2], size=command_split[3])
+                    else:
                         self.report_error(cmd=tool)
 
                 elif tool == 'mkdir':
@@ -164,9 +169,14 @@ class Kernel:
                             mode = ''
                             path_list = command_split[1:]
                         for path in path_list:
-                            my_file = self.my_file_manager.get_file(file_path=path)
+                            my_file = self.my_file_manager.get_file(file_path=path, seek_algo=seek_algo)
                             if my_file:
-                                self.my_process_manager.create_process(file=my_file)
+                                if my_file['type'][3] == 'x':
+                                    self.my_process_manager.create_process(file=my_file)
+                                else:
+                                    self.report_error(cmd=tool, err_msg='no execution permission')
+                            else:
+                                self.report_error(cmd=tool)
                     else:
                         self.report_error(cmd=tool)
 
@@ -213,5 +223,7 @@ class Kernel:
 
 
 if __name__ == '__main__':
+    init(autoreset=True)
+    matplotlib.use('Agg')
     my_kernel = Kernel()
     my_kernel.run()

@@ -12,3 +12,10 @@ preemptive = True
 time_slot = 1
 cpu_num = 1
 printer_num = 1
+
+# config about storage
+storage_block_size = 512
+storage_track_num = 200
+storage_sec_num = 12
+
+seek_algo = 'FCFS'  # from: {FCFS, SSTF, SCAN, C_SCAN, LOOK, C_LOOK}
