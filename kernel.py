@@ -12,9 +12,6 @@ import os
 import threading
 import matplotlib
 
-init(autoreset=True)
-matplotlib.use('Agg')
-
 
 class Kernel:
     def __init__(self):
@@ -52,7 +49,7 @@ class Kernel:
     def display_command_description(self, cmd_list):
         command_to_description = {
             'man': 'manual page, format: man [command1] [command2] ...',
-            'ls': 'list directory contents, format: ls [-a|-l|-al][path]',
+            'ls': 'list directory contents, format: ls [-a|-l|-al] [path]',
             'cd': 'change current working directory, format: cd [path]',
             'rm': 'remove file or directory recursively, format: rm [-r|-f|-rf] path',
             'mkdir': 'make directory, format: mkdir path',
@@ -71,7 +68,10 @@ class Kernel:
         if len(cmd_list) == 0:
             cmd_list = command_to_description.keys()
         for cmd in cmd_list:
-            print(cmd, '-', command_to_description[cmd])
+            if cmd in command_to_description.keys():
+                print(cmd, '-', command_to_description[cmd])
+            else:
+                self.report_error(cmd=cmd, err_msg='no such command')
 
     def run(self):
         while True:
@@ -213,5 +213,7 @@ class Kernel:
 
 
 if __name__ == '__main__':
+    init(autoreset=True)
+    matplotlib.use('Agg')
     my_kernel = Kernel()
     my_kernel.run()

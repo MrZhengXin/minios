@@ -55,7 +55,6 @@ class FileManager:
 
         self.disk = Disk()
 
-
     # load file into disk if success, return first block(linked list), else
     # report err
     def load(self, file):
@@ -118,8 +117,8 @@ class FileManager:
                         self.disk.C_LOOK(seek_queue)
                     else:
                         print("get_file: cannot get file '" +
-                            basename +
-                            "': '" + seek_algo + "' no such disk seek algorithm")
+                              basename +
+                              "': '" + seek_algo + "' no such disk seek algorithm")
                     # 未解决异常! 直接把形参mode丢到open()了.
                     f = open(gf_path, mode)
                     # print("get_file success")
@@ -357,7 +356,7 @@ class FileManager:
                     else:
                         print('\033[1;34m' + file + '\033[0m', '\t', end='')
                 # 可执行文件高亮绿色显示
-                elif current_working_dict[file][3] == 'x':
+                elif current_working_dict[file][0] == 'e':
                     if mode == '-l' or mode == '-al':
                         print(current_working_dict[file], '\t', '\033[1;32m' + file + '\033[0m')
                     else:
@@ -530,7 +529,7 @@ class FileManager:
                     print(
                         "rm -r: cannot remove '" +
                         basename +
-                        "': Dir not empty, try to use '-rf'")
+                        "': this directory is not empty, try to use 'rm -rf [path]'")
             # 空参数 或 -f 删文件
             elif mode == '' or mode == '-f':
                 try:
@@ -632,19 +631,15 @@ class FileManager:
         all_free = len(np.nonzero(self.bitmap)[0])
         all_free *= self.block_size  # 剩余的总字节数
         all_occupy = total - all_free  # 已占用的总字节数
-        print(
-            "total: {0} B,\t allocated: {1} B,\t free: {2} B\n".format(
-                total,
-                all_occupy,
-                all_free))
+        print("total: {0} B,\t allocated: {1} B,\t free: {2} B\n".format(total, all_occupy, all_free))
         # for fp, item in self.block_dir.items():  # 调试用
         #     print("{:<10}: start {}\t length {}".format(fp, item[0], item[1]))
         for i in range(self.block_number):
             b = self.all_blocks[i]
             occupy = self.block_size - b.get_free_space()
-            # all_free += b.get_free_space()
-            print("block #{:<5} {:>5} / {} Byte(s)   {:<20}".format(i,
-                                                                    occupy, self.block_size, str(b.get_fp())))
+            if occupy > 0:
+                # all_free += b.get_free_space()
+                print("block #{:<5} {:>5} / {} Byte(s)   {:<20}".format(i, occupy, self.block_size, str(b.get_fp())))
 
     # nowheadpointer 某次访存开始时磁头所在磁道号.
     def set_disk_now_headpointer(self, now_headpointer=0):
