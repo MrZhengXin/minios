@@ -1,7 +1,7 @@
 # coding=utf-8
 
 # config about memory
-memory_management_mode = 'cb'
+memory_management_mode = 'p'
 memory_page_size = 1024
 memory_page_number = 16
 memory_physical_page_number = 8

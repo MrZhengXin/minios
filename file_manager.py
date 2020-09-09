@@ -398,7 +398,7 @@ class FileManager:
                         else:
                             path_with_point = dir_path + self.file_separator
                         # 消除..和.
-                        dir_list = dir_path.split(self.file_separator)
+                        dir_list = path_with_point.split(self.file_separator)
                         dir_list = [i for i in dir_list if i != '']  # 去除由\分割出的空值
                         ptr = 0 #dir_list指针
                         while ptr < len(dir_list):

@@ -115,6 +115,7 @@ class MemoryManager:
 
     def access(self, pid, address):
         if self.mode == 'p':
+            print(pid, address)
             self.page_access(pid, address)
         elif self.mode == 'cb':
             self.continue_access(pid, address)

@@ -159,15 +159,7 @@ class Kernel:
 
                 elif tool == 'exec':
                     if argc >= 2:
-                        if command_split[1] == '-d':
-                            mode = '-d'
-                            if argc > 2:
-                                path_list = command_split[2:]
-                            else:
-                                self.report_error(cmd=tool)
-                        else:
-                            mode = ''
-                            path_list = command_split[1:]
+                        path_list = command_split[1:]
                         for path in path_list:
                             my_file = self.my_file_manager.get_file(file_path=path, seek_algo=seek_algo)
                             if my_file:
