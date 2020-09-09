@@ -111,9 +111,7 @@ class FileManager:
                     elif seek_algo == 'C_LOOK':
                         self.disk.C_LOOK(seek_queue)
                     else:
-                        print("get_file: cannot get file '" +
-                              basename +
-                              "': '" + seek_algo + "' no such disk seek algorithm")
+                        print("get_file: cannot get file '" + basename + "': '" + seek_algo + "' no such disk seek algorithm")
                     # 未解决异常! 直接把形参mode丢到open()了.
                     f = open(gf_path, mode)
                     # print("get_file success")

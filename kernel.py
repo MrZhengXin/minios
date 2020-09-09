@@ -135,7 +135,6 @@ class Kernel:
                     if argc >= 3:
                         self.my_file_manager.chmod(file_path=command_split[1], file_type=command_split[2])
                     else:
-                        print(command_split)
                         self.report_error(cmd=tool)
 
                 elif tool == 'mkdir':
@@ -164,9 +163,14 @@ class Kernel:
                             mode = ''
                             path_list = command_split[1:]
                         for path in path_list:
-                            my_file = self.my_file_manager.get_file(file_path=path)
+                            my_file = self.my_file_manager.get_file(file_path=path, seek_algo=seek_algo)
                             if my_file:
-                                self.my_process_manager.create_process(file=my_file)
+                                if my_file['type'][3] == 'x':
+                                    self.my_process_manager.create_process(file=my_file)
+                                else:
+                                    self.report_error(cmd=tool, err_msg='no execution permission')
+                            else:
+                                self.report_error(cmd=tool)
                     else:
                         self.report_error(cmd=tool)
 

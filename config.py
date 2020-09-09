@@ -17,3 +17,5 @@ printer_num = 1
 storage_block_size = 512
 storage_track_num = 200
 storage_sec_num = 12
+
+seek_algo = 'FCFS'
