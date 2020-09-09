@@ -275,8 +275,19 @@ class FileManager:
         dir_list = [i for i in dir_list if i != '']  # 去除由\分割出的空值
         dir_dict = self.file_system_tree
         try:
+            upper_dir_dict_stack = []
+            upper_dir_dict_stack.append(dir_dict)
             for i in range(len(dir_list)):
-                dir_dict = dir_dict[dir_list[i]]
+                if dir_list[i] == ".":
+                    pass
+                elif dir_list[i] == '..':
+                    if upper_dir_dict_stack:
+                        dir_dict = upper_dir_dict_stack.pop()
+                    else:
+                        dir_dict = self.file_system_tree
+                else:
+                    upper_dir_dict_stack.append(dir_dict)
+                    dir_dict = dir_dict[dir_list[i]]
             if not isinstance(dir_dict, dict):
                 pass
 
@@ -378,16 +389,37 @@ class FileManager:
                 self.current_working_path = os.sep
             else:
                 try:
-
-                    if isinstance(current_working_dict[basename], dict):
+                    if basename == "." or basename == ".." or isinstance(current_working_dict[basename], dict):
                         # 相对路径
                         if dir_path[0] != self.file_separator:
                             # 警告! 未解决异常: 当路径以数个\结尾时, \不会被无视.
-                            self.current_working_path += dir_path + self.file_separator
+                            path_with_point = self.current_working_path + dir_path + self.file_separator
                         # 绝对路径
                         else:
-                            self.current_working_path = dir_path + self.file_separator
-                        # print('cd ' + self.current_working_path + ' success')
+                            path_with_point = dir_path + self.file_separator
+                        # 消除..和.
+                        dir_list = dir_path.split(self.file_separator)
+                        dir_list = [i for i in dir_list if i != '']  # 去除由\分割出的空值
+                        ptr = 0 #dir_list指针
+                        while ptr < len(dir_list):
+                            # .即自身
+                            if dir_list[ptr] == '.':
+                                dir_list.pop(ptr)
+                            # ..表示返回上级
+                            elif dir_list[ptr] == '..':
+                                if ptr > 0:
+                                    dir_list.pop(ptr)
+                                    dir_list.pop(ptr-1)
+                                    ptr = ptr - 1
+                                # 当已经到根目录时
+                                else:
+                                    dir_list.pop(ptr)
+                            else:
+                                ptr = ptr + 1
+                        # 组合current_working_path
+                        self.current_working_path = '\\'
+                        for i in dir_list:
+                            self.current_working_path += i + '\\'
                     # 异常1 文件存在但不是目录
                     else:
                         print('cd: error ' + basename + ': Not a dir')
