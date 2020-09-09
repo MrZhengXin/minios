@@ -322,7 +322,7 @@ class ProcessManager:
 
         # draw gantt
         plt.close("all")
-        print(gantts[0])
+        # print(gantts[0])
         sns.heatmap(data=gantts, yticklabels=['cpu', 'printer'], cbar=None, annot=True, linewidths=0.5, robust=True, cmap='YlGnBu', vmin = -1, vmax = 7)
         plt.savefig('process_gantt_graph.jpg')
 
