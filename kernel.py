@@ -52,8 +52,8 @@ class Kernel:
             'ls': 'list directory contents, format: ls [-a|-l|-al] [path]',
             'cd': 'change current working directory, format: cd [path]',
             'rm': 'remove file or directory recursively, format: rm [-r|-f|-rf] path',
-            'mkdir': 'make directory, format: mkdir path',
-            # 'mkf': 'make file, format: mkf path',
+            'mkdir': 'create directory, format: mkdir path',
+            'mkf': 'create common file, format: mkf path type size, e.g. mkf my_file crwx 300',
             'dss': 'display storage status, format: dss',
             'dms': 'display memory status, format: dms',
             'exec': 'execute file, format: exec path, e.g. exec test',
@@ -134,6 +134,12 @@ class Kernel:
                 elif tool == 'chmod':
                     if argc >= 3:
                         self.my_file_manager.chmod(file_path=command_split[1], file_type=command_split[2])
+                    else:
+                        self.report_error(cmd=tool)
+
+                elif tool == 'mkf':
+                    if argc >= 4:
+                        self.my_file_manager.mkf(file_path=command_split[1], file_type=command_split[2], size=command_split[3])
                     else:
                         self.report_error(cmd=tool)
 

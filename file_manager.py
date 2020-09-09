@@ -117,13 +117,9 @@ class FileManager:
                     # print("get_file success")
                     return json.load(f)
                 else:
-                    print("get_file: cannot get file'" +
-                          basename +
-                          "': dir not a common file")
+                    print("get_file: cannot get file'" + basename + "': dir not a common file")
             else:
-                print("get_file: cannot get file'" +
-                      basename +
-                      "': file not exist")
+                print("get_file: cannot get file'" + basename + "': file not exist")
 
         return False
 
@@ -425,6 +421,9 @@ class FileManager:
 
     # command: make file
     def mkf(self, file_path, file_type='crwx', size='233', content=None):
+        if file_type[0] != 'c':
+            print("mkf: cannot create file'" + file_path + "': only common file can be created")
+            return
         (upper_path, basename) = self.path_split(file_path)
         current_working_dict = self.path2dict(upper_path)
         json_text = {
@@ -447,10 +446,7 @@ class FileManager:
                     mkf_path = file_path
                 if self.fill_file_into_blocks(
                         json_text, mkf_path, method=2) == -1:  # 测试是否能装入block
-                    print(
-                        "mkf: cannot create file'" +
-                        basename +
-                        "': No enough Space")
+                    print("mkf: cannot create file'" + basename + "': No enough Space")
                     return
                 mkf_path = self.root_path + mkf_path
                 f = open(mkf_path, 'w')

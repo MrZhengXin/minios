@@ -18,4 +18,4 @@ storage_block_size = 512
 storage_track_num = 200
 storage_sec_num = 12
 
-seek_algo = 'FCFS'
+seek_algo = 'FCFS'  # from: {FCFS, SSTF, SCAN, C_SCAN, LOOK, C_LOOK}
