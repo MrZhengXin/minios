@@ -53,12 +53,7 @@ class FileManager:
         self.file_system_tree = self._init_file_system_tree(self.root_path)
         self.free_unfillable_block()
 
-        self.disk = Disk()
-
-    # load file into disk if success, return first block(linked list), else
-    # report err
-    def load(self, file):
-        pass
+        self.disk = Disk(block_size, tracks, secs)
 
     # return file, if failed, report error and return None.
     # file_path支持绝对路径, mode格式与函数open()约定的相同
@@ -267,6 +262,7 @@ class FileManager:
         self.all_blocks = self._init_blocks()
         for f in block_dir.items():
             self.fill_file_into_blocks({"size": f[1][2]}, f[0])
+        print('tidy disk complete')
 
     def set_unfillable_block(self):
         for i in self.unfillable_block:
@@ -654,13 +650,13 @@ class FileManager:
 
 
 class Disk:
-    def __init__(self, now_headpointer=53, x_slow=10):
+    def __init__(self, block_size, track_num, sec_num, now_headpointer=53, x_slow=10):
         # 扇区大小 默认512byte
-        self.sector_size = 512
+        self.sector_size = block_size
         # 每磁道中扇区数 默认12
-        self.track_size = 12
+        self.track_size = sec_num
         # 总磁道数 默认200
-        self.track_num = 200
+        self.track_num = track_num
         # 当前磁头所在磁道号
         self.now_headpointer = now_headpointer
 

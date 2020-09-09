@@ -16,7 +16,7 @@ import matplotlib
 class Kernel:
     def __init__(self):
         self.my_shell = Shell()
-        self.my_file_manager = FileManager()
+        self.my_file_manager = FileManager(storage_block_size, storage_track_num, storage_sec_num)
         self.my_memory_manager = MemoryManager(mode=memory_management_mode,
                                                page_size=memory_page_size,
                                                page_number=memory_page_number,
