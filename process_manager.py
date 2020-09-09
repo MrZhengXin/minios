@@ -21,6 +21,7 @@ class ProcessControlBlock:
         self.create_time = create_time
         self.priority = priority
         self.size = size
+        self.pc = 0
 
         self.command_queue = []  # init
         for command in content:  # change "cpu 5" -> ["cpu",5]
@@ -56,7 +57,8 @@ class ProcessManager:
         # at most 1 process is running
 
     def fork(self):
-        self.pcb_list[self.current_running].command_queue.pop(0)  # command "fork" out
+        #self.pcb_list[self.current_running].command_queue.pop(0)  # command "fork" out
+        self.pcb_list[self.current_running].pc += 1
         size_to_alloc = self.pcb_list[self.current_running].size
         my_aid = self.memory_manager.alloc(pid=self.cur_pid, size=size_to_alloc)
         if my_aid != -1:
@@ -113,7 +115,7 @@ class ProcessManager:
         if self.current_running != -1:
             p = self.pcb_list[self.current_running].priority
             self.pcb_list[self.current_running].status = "ready"
-            if self.pcb_list[self.current_running].command_queue != []:
+            if len(self.pcb_list[self.current_running].command_queue) != self.pcb_list[self.current_running].pc:
                 self.ready_queue[p].append(self.current_running)
         self.Scheduler()
 
@@ -121,14 +123,15 @@ class ProcessManager:
     def io_interrupt(self):
         self.pcb_list[self.current_running].status = "waiting"
         self.waiting_queue.append(self.current_running)
-        expect_time = self.pcb_list[self.current_running].command_queue[0][1] * 60
+        expect_time = self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][1] * self.time_slot
         if self.printer.free_resource > 0:
             self.printer.insert(self.current_running, expect_time)
             self.pcb_list[self.current_running].status = "waiting(Printer)"
         self.Scheduler()
 
     def release(self, pid):
-        self.pcb_list[pid].command_queue.pop(0)
+        #self.pcb_list[pid].command_queue.pop(0)
+        self.pcb_list[pid].pc += 1
         self.waiting_queue.remove(pid)
         for info in self.printer.running_queue:
             if info[0] == pid:
@@ -136,7 +139,7 @@ class ProcessManager:
         self.printer.free_resource += 1
         for waiting_pid in self.waiting_queue:
             if self.pcb_list[waiting_pid].status != 'waiting(Printer)' and self.printer.free_resource > 0:
-                expect_time = self.pcb_list[waiting_pid].command_queue[0][1] * 60
+                expect_time = self.pcb_list[waiting_pid].command_queue[self.pcb_list[self.current_running].pc][1] * self.time_slot
                 self.printer.insert(waiting_pid, expect_time)
                 self.pcb_list[waiting_pid].status = "waiting(Printer)"
 
@@ -207,47 +210,47 @@ class ProcessManager:
         self.running = True
         while self.running:
             self.time_out()
-            while self.current_running != -1 and self.pcb_list[self.current_running].command_queue[0][0] == "printer":
+            while self.current_running != -1 and self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][0] == "printer":
                 self.io_interrupt()
-            if self.current_running != -1 and self.pcb_list[self.current_running].command_queue[0][0] == "fork":
+            if self.current_running != -1 and self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][0] == "fork":
                 self.fork()
                 time.sleep(self.time_slot)
                 self.append_resources_history('cpu', self.pcb_list[self.current_running].pid)
 
             # 2020.6.12 add by chenbin
-            if self.current_running != -1 and self.pcb_list[self.current_running].command_queue[0][0] == "access":
-                address = int(self.pcb_list[self.current_running].command_queue[0][1])
+            if self.current_running != -1 and self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][0] == "access":
+                address = int(self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][1])
 
                 self.memory_manager.access(pid=self.pcb_list[self.current_running].pid,
                                                address=address)
                 #except:
                 #    print('[pid #%d] access address %d failed' % (self.current_running, address))
-                self.pcb_list[self.current_running].command_queue.pop(0)
+                #self.pcb_list[self.current_running].command_queue.pop(0)
+                self.pcb_list[self.current_running].pc += 1
 
             time.sleep(self.time_slot)
-
             if self.current_running != -1:
                 # print(self.pcb_list[self.current_running].command_queue)
-                if len(self.pcb_list[self.current_running].command_queue) == 0:
+                if len(self.pcb_list[self.current_running].command_queue) ==self.pcb_list[self.current_running].pc:
                     sys.stdout.write('\033[2K\033[1G')  # avoid \$ [pid #1] finish!
                     self.memory_manager.free(self.current_running)
                     print("[pid #%d] finish!" % self.current_running)
                     self.pcb_list[self.current_running].status = 'terminated'
                     self.current_running = -1
-                elif len(self.pcb_list[self.current_running].command_queue[0]) > 1:
-                    self.pcb_list[self.current_running].command_queue[0][1] -= 1  # update cpu-working time
+                elif len(self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc]) > 1:
+                    self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][1] -= 1  # update cpu-working time
                     self.append_resources_history('cpu', self.pcb_list[self.current_running].pid)
-                    if self.pcb_list[self.current_running].command_queue[0][1] == 0:
-                        self.pcb_list[self.current_running].command_queue.pop(0)
-
+                    if self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][1] == 0:
+                        #self.pcb_list[self.current_running].command_queue.pop(0)
+                        self.pcb_list[self.current_running].pc += 1
             for info in self.printer.running_queue:
                 pid = info[0]
                 info[3] = info[3] + 1  # update used_time
                 self.append_resources_history('printer', self.pcb_list[self.current_running].pid)
-                self.pcb_list[pid].command_queue[0][1] -= 1
-                if self.pcb_list[pid].command_queue[0][1] == 0:
+                self.pcb_list[pid].command_queue[self.pcb_list[pid].pc][1] -= 1
+                if self.pcb_list[pid].command_queue[self.pcb_list[pid].pc][1] == 0:
                     p = self.pcb_list[pid].priority
-                    if self.pcb_list[pid].command_queue != []:
+                    if self.pcb_list[pid].command_queue != self.pcb_list[pid].pc:
                         self.ready_queue[p].append(pid)
                     else:
                         self.memory_manager.free(pid)
