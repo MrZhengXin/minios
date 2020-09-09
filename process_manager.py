@@ -264,9 +264,9 @@ class ProcessManager:
         ax[0].set_ylim(-0.1, 1.1)
         end_time = int(time.time())
         start_time = end_time - 9
-        ys = []
+        ys, gantts = [], []
         for i in self.devices:
-            x, y = [], []
+            x, y, gantt = [], [], []
             
             # remove too old records
             while len(self.resources_history[i]) > 0 and self.resources_history[i][0][0] < start_time - 4.0:
@@ -280,6 +280,7 @@ class ProcessManager:
                 for j in range(start_time, last_time, 1):
                     x.append(j - start_time)
                     y.append(0)
+                    gantt.append(-1)
 
             for the_time, pid in self.resources_history[i]:
                 # idle time
@@ -288,23 +289,27 @@ class ProcessManager:
                     if j >= start_time:
                         x.append(j - start_time)
                         y.append(average_utilization)
+                        gantt.append(-1)
                 last_time = the_time
                 # using time
                 average_utilization = average_utilization * 0.5 + 1 * 0.5
                 if the_time >= start_time:
                     x.append(the_time - start_time)
                     y.append(average_utilization)
+                    gantt.append(pid)
 
             # idle time at the end
             if len(x) == 0:
-                x, y = [j for j in range(10)], [0 for j in range(10)]
+                x, y, gantt = [j for j in range(10)], [0 for j in range(10)], [-1 for j in range(10)]
             else:
                 while x[-1]  < 9:
                     average_utilization = average_utilization * 0.5
                     x.append(x[-1]+1)
                     y.append(average_utilization)
+                    gantt.append(-1)
             ax[0].plot(x, y)
             ys.append(y)
+            gantts.append(gantt)
                 
         ax[0].legend(self.devices)
         
@@ -314,6 +319,13 @@ class ProcessManager:
         plt.tight_layout()            
 
         plt.savefig('cpu_and_printer.jpg')
+
+        # draw gantt
+        plt.close("all")
+        print(gantts[0])
+        sns.heatmap(data=gantts, cbar=None, annot=True, linewidths=0.5, robust=True, cmap='YlGnBu', vmin = -1, vmax = 7)
+        plt.savefig('process_gantt_graph.jpg')
+
         # print('Figure saved at resource_monitor.png')
 
     def input(self):
