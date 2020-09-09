@@ -79,12 +79,14 @@ class MemoryManager:
         self.physicalsize = 0
 
         # used for plotting
-        self.physical_rate = [0]
         self.virtual_rate = [0]
-        self.physical_history = [copy.deepcopy(self.physical_memory)]
-        self.x = [0]  # for x axis
-        self.page_fault = 0
-        self.page_access = 0
+        # for x axis
+        self.x = [0]
+        if mode == 'p':
+            self.physical_rate = [0]
+            self.physical_history = [copy.deepcopy(self.physical_memory)]
+            self.page_fault = 0
+            self.page_access = 0
 
     # load executable file into memory
     # if failed, report error and return -1
@@ -110,6 +112,12 @@ class MemoryManager:
             self.page_show()
         elif self.mode == 'cb':
             self.continue_show()
+
+    def access(self, pid, address):
+        if self.mode == 'p':
+            self.page_access(pid, address)
+        elif self.mode == 'cb':
+            self.continue_access(pid, address)
 
     # if the memory has the page structure
     def page_alloc(self, pid, size):
@@ -239,7 +247,7 @@ class MemoryManager:
             return False
         return True
 
-    def access(self, pid, address):
+    def page_access(self, pid, address):
         '''
         :param pid: the process to visit
         :param address: the relative address of the process
@@ -262,6 +270,17 @@ class MemoryManager:
         elif self.schedule == 'FIFO':
             self.FIFO(virtual_pageID, ptable)
         pass  # more algorithm to be continued
+
+    def continue_access(self, pid, address):
+        virtual_memory = pd.DataFrame(self.r, columns=['start_address', 'size', 'pid', 'aid'])
+        memory = virtual_memory[virtual_memory['pid'] == pid]
+        memory = memory.sort_values('start_address')
+        delta, i = address, 0
+        while delta > 0 and i < memory.shape[0]:
+            delta -= memory.iloc[i]['size']
+            i += 1
+        if delta > 0:
+            print('Error, memory access not found!')
 
     def LRU(self, pnum, ptable):
         """
@@ -342,6 +361,12 @@ class MemoryManager:
                                                                                              self.r[i][3]))
 
     def memory_watching(self):
+        if self.mode == 'p':
+            self.memory_watching_page()
+        else:
+            self.continue_memory_watching()
+
+    def memory_watching_page(self):
         plt.close("all")
         self.physical_rate.append(self.physicalsize / (self.ps * self.ppn))
         self.virtual_rate.append(self.allocated / self.total)
@@ -392,9 +417,28 @@ class MemoryManager:
         plt.savefig('memory.jpg')
         # plt.show()
 
+    def continue_memory_watching(self):
+        plt.close()
+        self.virtual_rate.append(self.allocated / self.total)
+        if len(self.x) < 10:
+            self.x.append(self.x[-1] + 1)
+        else:
+            self.x.pop(0)
+            self.x.append(self.x[-1] + 1)
+        plt.xticks(self.x)
+        plt.yticks(np.arange(0, 1.1, 0.1))
+        plt.ylim(0, 1.1)
+        if len(self.virtual_rate) > 10:
+            plt.plot(self.x, self.virtual_rate[-10:], c='b')
+        else:
+            plt.plot(self.x, self.virtual_rate, c='b')
+        plt.legend(['memory'])
+        plt.savefig('memory.jpg')
+        # plt.show()
+
 
 if __name__ == '__main__':
-    mm = MemoryManager(mode='p')
+    mm = MemoryManager(mode='cb')
     t = mm.alloc(0, 200)
     mm.display_memory_status()
     mm.alloc(1, 2000)
