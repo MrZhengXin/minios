@@ -115,8 +115,7 @@ class MemoryManager:
 
     def access(self, pid, address):
         if self.mode == 'p':
-            print(pid, address)
-            self.page_access(pid, address)
+            self.page1_access(pid, address)
         elif self.mode == 'cb':
             self.continue_access(pid, address)
 
@@ -248,7 +247,7 @@ class MemoryManager:
             return False
         return True
 
-    def page_access(self, pid, address):
+    def page1_access(self, pid, address):
         '''
         :param pid: the process to visit
         :param address: the relative address of the process
