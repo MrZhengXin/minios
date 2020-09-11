@@ -1,5 +1,4 @@
 # coding=utf-8
-
 import datetime
 import time
 
@@ -23,11 +22,15 @@ class HardwareResource:
             for info in self.running_queue:
                 self.free_time = min(self.free_time, info[2])
             recent_free_time = self.free_time.strftime("%Y-%m-%d %H:%M:%S")
-            print('%d Printer is using,the recent free time is %s' % (len(self.running_queue), recent_free_time))
+            print('%d Printer is using,the recent free time is %s' %
+                  (len(self.running_queue), recent_free_time))
         elif self.free_resource == self.resource_num:
-            print('No Printer is using,there are %d Printer is free' % self.free_resource)
+            print(
+                'No Printer is using,there are %d Printer is free' %
+                self.free_resource)
         else:
-            print("%d Printer is free,%d Printer is using," % (self.free_resource, len(self.running_queue)))
+            print("%d Printer is free,%d Printer is using," %
+                  (self.free_resource, len(self.running_queue)))
         for num, info in enumerate(self.running_queue):
             starting_time = info[1].strftime("%Y-%m-%d %H:%M:%S")
             free_time = info[2].strftime("%Y-%m-%d %H:%M:%S")

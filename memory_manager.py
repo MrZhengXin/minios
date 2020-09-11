@@ -32,7 +32,8 @@ class PageTable:
         else:
             return -1
 
-    def modify(self, pnum, fnum, valid):  # when the virtual page being schedule in/out the physical memory
+    # when the virtual page being schedule in/out the physical memory
+    def modify(self, pnum, fnum, valid):
         """
         :param pnum: which virtual page to modify
         :param fnum: the frame number to add
@@ -45,7 +46,8 @@ class PageTable:
 
 
 class MemoryManager:
-    def __init__(self, mode, page_size=1024, page_number=8, physical_page=3, schedule='FIFO'):
+    def __init__(self, mode, page_size=1024, page_number=8,
+                 physical_page=3, schedule='FIFO'):
         """
         :param mode: to define the way to allocate the memory
         :param page_size: the size of each page(useful when mode == 'p')
@@ -54,15 +56,18 @@ class MemoryManager:
         """
         if mode == 'p':
             # record the virtual memory
-            self.virtual_memory = np.array([[page_size, -1, 0] for i in range(page_number)])
+            self.virtual_memory = np.array(
+                [[page_size, -1, 0] for i in range(page_number)])
             # record = np.zeros((physical_page, 2))
             self.physical_memory = [-1 for i in range(physical_page)]
-            # for LRU algorithm, the first one is the Least Recent Used, the last is recently visited
+            # for LRU algorithm, the first one is the Least Recent Used, the
+            # last is recently visited
             self.schedule_queue = []
             self.ps = page_size
             self.pn = page_number
             self.ppn = physical_page  # the number of physical page
-            # record the page table of all the process, has a k_v as (pid: PageTable)
+            # record the page table of all the process, has a k_v as (pid:
+            # PageTable)
             self.page_tables = {}
             self.schedule = schedule
         elif mode == 'cb':
@@ -71,7 +76,8 @@ class MemoryManager:
                 hole: [start_address, size]
                     '''
             self.r = []  # record for memory status
-            self.hole = [[0, page_size * page_number]]  # record for the empty memory
+            # record for the empty memory
+            self.hole = [[0, page_size * page_number]]
         self.mode = mode
         self.cur_aid = 0  # record every allocation
         self.total = page_number * page_size
@@ -143,7 +149,8 @@ class MemoryManager:
             if s == 0:
                 self.allocated += size
                 break
-        # if the file cannot be loaded into memory then free the above allocation
+        # if the file cannot be loaded into memory then free the above
+        # allocation
         if s > 0:
             self.page_free(pid, aid)
             return -1
@@ -183,7 +190,7 @@ class MemoryManager:
         status = 0  # if the pid with aid were found in memory
         delete = []
         for i in range(len(self.r)):
-            if (self.r[i][-1] == aid or aid == None) and self.r[i][-2] == pid:
+            if (self.r[i][-1] == aid or aid is None) and self.r[i][-2] == pid:
                 base_address = self.r[i][0]
                 size = self.r[i][1]
                 self.allocated -= size
@@ -226,7 +233,8 @@ class MemoryManager:
         # print('chenbin: debug', 'pid', pid, 'aid', aid)
         status = 0
         for i in range(self.pn):
-            if self.virtual_memory[i][1] == pid and (self.virtual_memory[i][2] == aid or aid is None):
+            if self.virtual_memory[i][1] == pid and (
+                    self.virtual_memory[i][2] == aid or aid is None):
                 status = 1
 
                 if i in self.physical_memory:  # if the page in physical memory, free it.
@@ -234,10 +242,12 @@ class MemoryManager:
                     self.physicalsize -= self.virtual_memory[i][0]
                     self.schedule_queue.remove(i)
 
-                ptable = self.page_tables[pid]  # to delete the process's page item
+                # to delete the process's page item
+                ptable = self.page_tables[pid]
                 ptable.delete(i)
 
-                self.allocated -= self.virtual_memory[i][0]  # to free it from virtual memory.
+                # to free it from virtual memory.
+                self.allocated -= self.virtual_memory[i][0]
                 self.virtual_memory[i][0] = self.ps
                 self.virtual_memory[i][1] = -1
                 self.virtual_memory[i][2] = 0
@@ -258,9 +268,11 @@ class MemoryManager:
         # print('chenbin: debug', 'pid', pid, 'address', address)
 
         ptable = self.page_tables[pid]  # get the page table to be visited
-        virtual_pageID = ptable.transform(address, self.ps)  # calculate the exact page to be visited
+        # calculate the exact page to be visited
+        virtual_pageID = ptable.transform(address, self.ps)
 
-        if virtual_pageID == -1 or self.virtual_memory[virtual_pageID][0] < page_offset:
+        if virtual_pageID == - \
+                1 or self.virtual_memory[virtual_pageID][0] < page_offset:
             # if not existed or the offset illegal
             print("ERROR ADDRESS !!!!")
             return
@@ -272,7 +284,13 @@ class MemoryManager:
         pass  # more algorithm to be continued
 
     def continue_access(self, pid, address):
-        virtual_memory = pd.DataFrame(self.r, columns=['start_address', 'size', 'pid', 'aid'])
+        virtual_memory = pd.DataFrame(
+            self.r,
+            columns=[
+                'start_address',
+                'size',
+                'pid',
+                'aid'])
         memory = virtual_memory[virtual_memory['pid'] == pid]
         memory = memory.sort_values('start_address')
         delta, i = address, 0
@@ -295,19 +313,25 @@ class MemoryManager:
             self.physical_memory[self.physical_memory.index(-1)] = pnum
             self.physicalsize += self.virtual_memory[pnum][0]
             self.schedule_queue.append(pnum)  # enlarge queue
-            ptable.modify(pnum, self.physical_memory.index(pnum), 1)  # modify the page table
+            ptable.modify(
+                pnum,
+                self.physical_memory.index(pnum),
+                1)  # modify the page table
             self.page_fault += 1  # page_fault ++
 
         else:  # switch page
-            index = self.physical_memory.index(self.schedule_queue[0])  # always switch out the first in the queue
+            # always switch out the first in the queue
+            index = self.physical_memory.index(self.schedule_queue[0])
             self.physical_memory[index] = pnum
             pid = self.virtual_memory[self.schedule_queue[0]][2]
 
-            self.physicalsize -= self.virtual_memory[self.schedule_queue[0]][0]  # modify the physical memory status
+            # modify the physical memory status
+            self.physicalsize -= self.virtual_memory[self.schedule_queue[0]][0]
             self.physicalsize += self.virtual_memory[pnum][0]
             self.page_fault += 1  # page_fault ++
 
-            p1 = self.page_tables[pid]  # change the page table and modify the queue
+            # change the page table and modify the queue
+            p1 = self.page_tables[pid]
             p1.modify(self.schedule_queue[0], 0, -1)
             self.schedule_queue.pop(0)
             self.schedule_queue.append(pnum)
@@ -323,18 +347,24 @@ class MemoryManager:
             self.physical_memory[self.physical_memory.index(-1)] = pnum
             self.physicalsize += self.virtual_memory[pnum][0]
             self.schedule_queue.append(pnum)  # enlarge queue
-            ptable.modify(pnum, self.physical_memory.index(pnum), 1)  # modify the page table
+            ptable.modify(
+                pnum,
+                self.physical_memory.index(pnum),
+                1)  # modify the page table
             self.page_fault += 1  # page_fault ++
         elif ptable.table[pnum][1] != 1:
-            index = self.physical_memory.index(self.schedule_queue[0])  # always switch out the first in the queue
+            # always switch out the first in the queue
+            index = self.physical_memory.index(self.schedule_queue[0])
             self.physical_memory[index] = pnum
             pid = self.virtual_memory[self.schedule_queue[0]][2]
 
-            self.physicalsize -= self.virtual_memory[self.schedule_queue[0]][0]  # modify the physical memory status
+            # modify the physical memory status
+            self.physicalsize -= self.virtual_memory[self.schedule_queue[0]][0]
             self.physicalsize += self.virtual_memory[pnum][0]
             self.page_fault += 1  # page_fault ++
 
-            p1 = self.page_tables[pid]  # change the page table and modify the queue
+            # change the page table and modify the queue
+            p1 = self.page_tables[pid]
             p1.modify(self.schedule_queue[0], 0, -1)
             self.schedule_queue.pop(0)
             self.schedule_queue.append(pnum)
@@ -344,7 +374,8 @@ class MemoryManager:
         print('total: %-dB allocated: %-dB free: %-dB' % (self.total, self.allocated,
                                                           self.total - self.allocated))
         for i in range(self.pn):
-            if self.virtual_memory[i][1] != -1 and self.virtual_memory[i][2] != -1:
+            if self.virtual_memory[i][1] != - \
+                    1 and self.virtual_memory[i][2] != -1:
                 print(
                     "block #%d  %-4d/%-4d Byte(s)  pid =%-3d  aid =%-3d" % (i, self.virtual_memory[i][0], self.ps,
                                                                             self.virtual_memory[i][1],
@@ -396,7 +427,9 @@ class MemoryManager:
         else:
             page_fault_rate = self.page_fault / self.page_access
 
-        ax1.set_title('%.2f memory access, page_fault rate %.2f' % (self.page_access, page_fault_rate))
+        ax1.set_title(
+            '%.2f memory access, page_fault rate %.2f' %
+            (self.page_access, page_fault_rate))
 
         if len(self.physical_rate) > 10:
             ax1.plot(self.x, self.physical_rate[-10:], label='physical', c='r')
@@ -407,7 +440,11 @@ class MemoryManager:
             ax1.plot(self.x, self.virtual_rate, label='virtual', c='b')
         ax1.legend(['physical', 'virtual'], loc=1)
 
-        physical_memory = pd.DataFrame(self.physical_history, columns=['#frame %d' % i for i in range(self.ppn)])
+        physical_memory = pd.DataFrame(
+            self.physical_history, columns=[
+                '#frame %d' %
+                i for i in range(
+                    self.ppn)])
 
         physical_memory = pd.DataFrame(physical_memory.values.T, index=physical_memory.columns,
                                        columns=self.x)

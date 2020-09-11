@@ -16,16 +16,24 @@ import matplotlib
 class Kernel:
     def __init__(self):
         self.my_shell = Shell()
-        self.my_file_manager = FileManager(storage_block_size, storage_track_num, storage_sec_num)
+        self.my_file_manager = FileManager(
+            storage_block_size, storage_track_num, storage_sec_num)
         self.my_memory_manager = MemoryManager(mode=memory_management_mode,
                                                page_size=memory_page_size,
                                                page_number=memory_page_number,
                                                physical_page=memory_physical_page_number)
-        self.my_process_manager = ProcessManager(self.my_memory_manager, priority, preemptive, time_slot, cpu_num, printer_num)
+        self.my_process_manager = ProcessManager(
+            self.my_memory_manager,
+            priority,
+            preemptive,
+            time_slot,
+            cpu_num,
+            printer_num)
 
         self.is_monitoring = False
         # start process manager
-        self.my_process_manager_run_thread = threading.Thread(target=self.my_process_manager.run)
+        self.my_process_manager_run_thread = threading.Thread(
+            target=self.my_process_manager.run)
         self.my_process_manager_run_thread.start()
 
         # signal.signal(signal.SIGINT, self.my_shell.deblock)
@@ -93,7 +101,8 @@ class Kernel:
                 argc = len(command_split)  # argument count
 
                 if tool == 'man':
-                    self.display_command_description(cmd_list=command_split[1:])
+                    self.display_command_description(
+                        cmd_list=command_split[1:])
 
                 elif tool == 'ls':
                     if argc >= 2:
@@ -133,13 +142,17 @@ class Kernel:
 
                 elif tool == 'chmod':
                     if argc >= 3:
-                        self.my_file_manager.chmod(file_path=command_split[1], file_type=command_split[2])
+                        self.my_file_manager.chmod(
+                            file_path=command_split[1], file_type=command_split[2])
                     else:
                         self.report_error(cmd=tool)
 
                 elif tool == 'mkf':
                     if argc >= 4:
-                        self.my_file_manager.mkf(file_path=command_split[1], file_type=command_split[2], size=command_split[3])
+                        self.my_file_manager.mkf(
+                            file_path=command_split[1],
+                            file_type=command_split[2],
+                            size=command_split[3])
                     else:
                         self.report_error(cmd=tool)
 
@@ -161,12 +174,15 @@ class Kernel:
                     if argc >= 2:
                         path_list = command_split[1:]
                         for path in path_list:
-                            my_file = self.my_file_manager.get_file(file_path=path, seek_algo=seek_algo)
+                            my_file = self.my_file_manager.get_file(
+                                file_path=path, seek_algo=seek_algo)
                             if my_file:
                                 if my_file['type'][3] == 'x':
-                                    self.my_process_manager.create_process(file=my_file)
+                                    self.my_process_manager.create_process(
+                                        file=my_file)
                                 else:
-                                    self.report_error(cmd=tool, err_msg='no execution permission')
+                                    self.report_error(
+                                        cmd=tool, err_msg='no execution permission')
                             else:
                                 self.report_error(cmd=tool)
                     else:
@@ -188,10 +204,10 @@ class Kernel:
                     else:
                         # start monitoring
                         print('Start monitoring')
-                        monitor_thread = threading.Thread(target=self.monitoring)
+                        monitor_thread = threading.Thread(
+                            target=self.monitoring)
                         monitor_thread.daemon = True
                         monitor_thread.start()
-
 
                 elif tool == 'td':
                     self.my_file_manager.tidy_disk()
@@ -200,7 +216,8 @@ class Kernel:
                     if argc >= 2:
                         for pid in command_split[1:]:
                             pid_to_kill = int(pid)
-                            kill_res = self.my_process_manager.kill_process(pid=pid_to_kill)
+                            kill_res = self.my_process_manager.kill_process(
+                                pid=pid_to_kill)
                             if kill_res:
                                 self.my_memory_manager.free(pid=pid_to_kill)
                     else:

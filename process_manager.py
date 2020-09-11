@@ -32,10 +32,9 @@ class ProcessControlBlock:
         self.status = "ready"
 
 
-
-
 class ProcessManager:
-    def __init__(self, memory_manager, priority=True, preemptive=False, time_slot=1, cpu_num=1, printer_num=1):
+    def __init__(self, memory_manager, priority=True,
+                 preemptive=False, time_slot=1, cpu_num=1, printer_num=1):
         self.cur_pid = 0
         self.priority = priority
         self.preemptive = preemptive
@@ -46,7 +45,7 @@ class ProcessManager:
         self.pcb_list = []
         self.printer = HardwareResource(printer_num)
         self.devices = ['cpu', 'printer']
-        self.resources_history = {i:[] for i in self.devices}
+        self.resources_history = {i: [] for i in self.devices}
         self.history_length = 14.0
         self.running = False
 
@@ -57,19 +56,24 @@ class ProcessManager:
         # at most 1 process is running
 
     def fork(self):
-        #self.pcb_list[self.current_running].command_queue.pop(0)  # command "fork" out
+        # self.pcb_list[self.current_running].command_queue.pop(0)  # command
+        # "fork" out
         self.pcb_list[self.current_running].pc += 1
         size_to_alloc = self.pcb_list[self.current_running].size
-        my_aid = self.memory_manager.alloc(pid=self.cur_pid, size=size_to_alloc)
+        my_aid = self.memory_manager.alloc(
+            pid=self.cur_pid, size=size_to_alloc)
         if my_aid != -1:
             child_pcb = copy.deepcopy(self.pcb_list[self.current_running])
             child_pcb.ppid = self.current_running  # parent pid is the current process pid
             child_pcb.pid = self.cur_pid
-            child_pcb.create_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+            child_pcb.create_time = time.strftime(
+                '%Y-%m-%d %H:%M:%S', time.localtime())
             self.ready_queue[child_pcb.priority].append(self.cur_pid)
             self.pcb_list.append(child_pcb)
             sys.stdout.write('\033[2K\033[1G')  # avoid \$ [pid #1] finish!
-            print("[pid %d] process forked successfully by [pid %d]" % (self.cur_pid, self.current_running))
+            print(
+                "[pid %d] process forked successfully by [pid %d]" %
+                (self.cur_pid, self.current_running))
             self.cur_pid += 1
             return self.cur_pid
         else:
@@ -78,7 +82,8 @@ class ProcessManager:
     # 2020.6.9 陈斌：判断是可执行的文件类型，才创建进程，否则提示错误
     def create_process(self, file):
         if file['type'][0] == 'e':
-            my_aid = self.memory_manager.alloc(pid=self.cur_pid, size=int(file['size']))
+            my_aid = self.memory_manager.alloc(
+                pid=self.cur_pid, size=int(file['size']))
             if my_aid != -1:
                 self.pcb_list.append(ProcessControlBlock(self.cur_pid, 0, time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
                                                          file['name'], file['priority'], file['content'], int(file['size'])))  # ppid of process created by OS is 0
@@ -115,7 +120,8 @@ class ProcessManager:
         if self.current_running != -1:
             p = self.pcb_list[self.current_running].priority
             self.pcb_list[self.current_running].status = "ready"
-            if len(self.pcb_list[self.current_running].command_queue) != self.pcb_list[self.current_running].pc:
+            if len(
+                    self.pcb_list[self.current_running].command_queue) != self.pcb_list[self.current_running].pc:
                 self.ready_queue[p].append(self.current_running)
         self.Scheduler()
 
@@ -123,14 +129,15 @@ class ProcessManager:
     def io_interrupt(self):
         self.pcb_list[self.current_running].status = "waiting"
         self.waiting_queue.append(self.current_running)
-        expect_time = self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][1] * self.time_slot
+        expect_time = self.pcb_list[self.current_running].command_queue[
+            self.pcb_list[self.current_running].pc][1] * self.time_slot
         if self.printer.free_resource > 0:
             self.printer.insert(self.current_running, expect_time)
             self.pcb_list[self.current_running].status = "waiting(Printer)"
         self.Scheduler()
 
     def release(self, pid):
-        #self.pcb_list[pid].command_queue.pop(0)
+        # self.pcb_list[pid].command_queue.pop(0)
         self.pcb_list[pid].pc += 1
         self.waiting_queue.remove(pid)
         for info in self.printer.running_queue:
@@ -139,7 +146,8 @@ class ProcessManager:
         self.printer.free_resource += 1
         for waiting_pid in self.waiting_queue:
             if self.pcb_list[waiting_pid].status != 'waiting(Printer)' and self.printer.free_resource > 0:
-                expect_time = self.pcb_list[waiting_pid].command_queue[self.pcb_list[self.current_running].pc][1] * self.time_slot
+                expect_time = self.pcb_list[waiting_pid].command_queue[
+                    self.pcb_list[self.current_running].pc][1] * self.time_slot
                 self.printer.insert(waiting_pid, expect_time)
                 self.pcb_list[waiting_pid].status = "waiting(Printer)"
 
@@ -150,7 +158,9 @@ class ProcessManager:
             status = self.pcb_list[pid].status
             self.pcb_list[pid].status = 'terminated'
             if status == 'terminated':
-                print('kill: kill %d failed: the process is already terminiated' % pid)
+                print(
+                    'kill: kill %d failed: the process is already terminiated' %
+                    pid)
             else:
                 if status == 'ready':
                     p = self.pcb_list[pid].priority
@@ -197,12 +207,13 @@ class ProcessManager:
         unix_time = int(time.time())
         # last_unix_time = unix_time - self.history_length
         # if len(self.resources_history[type]) != 0:
-            # last_unix_time = self.resources_history[type][-1][0]
+        # last_unix_time = self.resources_history[type][-1][0]
         # if unix_time - last_unix_time > 2.0:  # idle time
-            # self.resources_history[type].append([last_unix_time + 0.001, -1])
-            # self.resources_history[type].append([unix_time - 0.001, -1])
+        # self.resources_history[type].append([last_unix_time + 0.001, -1])
+        # self.resources_history[type].append([unix_time - 0.001, -1])
         self.resources_history[type].append([unix_time, pid])
-        while len(self.resources_history[type]) > 0 and unix_time - self.resources_history[type][0][0] > self.history_length:
+        while len(self.resources_history[type]) > 0 and unix_time - \
+                self.resources_history[type][0][0] > self.history_length:
             self.resources_history[type] = self.resources_history[type][1:]
 
     # start scheduling
@@ -210,43 +221,53 @@ class ProcessManager:
         self.running = True
         while self.running:
             self.time_out()
-            while self.current_running != -1 and self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][0] == "printer":
+            while self.current_running != - \
+                    1 and self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][0] == "printer":
                 self.io_interrupt()
-            if self.current_running != -1 and self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][0] == "fork":
+            if self.current_running != - \
+                    1 and self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][0] == "fork":
                 self.fork()
                 time.sleep(self.time_slot)
-                self.append_resources_history('cpu', self.pcb_list[self.current_running].pid)
+                self.append_resources_history(
+                    'cpu', self.pcb_list[self.current_running].pid)
 
             # 2020.6.12 add by chenbin
-            if self.current_running != -1 and self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][0] == "access":
-                address = int(self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][1])
+            if self.current_running != - \
+                    1 and self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][0] == "access":
+                address = int(
+                    self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][1])
 
                 self.memory_manager.access(pid=self.pcb_list[self.current_running].pid,
-                                               address=address)
-                #except:
+                                           address=address)
+                # except:
                 #    print('[pid #%d] access address %d failed' % (self.current_running, address))
-                #self.pcb_list[self.current_running].command_queue.pop(0)
+                # self.pcb_list[self.current_running].command_queue.pop(0)
                 self.pcb_list[self.current_running].pc += 1
 
             time.sleep(self.time_slot)
             if self.current_running != -1:
                 # print(self.pcb_list[self.current_running].command_queue)
-                if len(self.pcb_list[self.current_running].command_queue) ==self.pcb_list[self.current_running].pc:
-                    sys.stdout.write('\033[2K\033[1G')  # avoid \$ [pid #1] finish!
+                if len(
+                        self.pcb_list[self.current_running].command_queue) == self.pcb_list[self.current_running].pc:
+                    # avoid \$ [pid #1] finish!
+                    sys.stdout.write('\033[2K\033[1G')
                     self.memory_manager.free(self.current_running)
                     print("[pid #%d] finish!" % self.current_running)
                     self.pcb_list[self.current_running].status = 'terminated'
                     self.current_running = -1
                 elif len(self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc]) > 1:
-                    self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][1] -= 1  # update cpu-working time
-                    self.append_resources_history('cpu', self.pcb_list[self.current_running].pid)
+                    # update cpu-working time
+                    self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][1] -= 1
+                    self.append_resources_history(
+                        'cpu', self.pcb_list[self.current_running].pid)
                     if self.pcb_list[self.current_running].command_queue[self.pcb_list[self.current_running].pc][1] == 0:
-                        #self.pcb_list[self.current_running].command_queue.pop(0)
+                        # self.pcb_list[self.current_running].command_queue.pop(0)
                         self.pcb_list[self.current_running].pc += 1
             for info in self.printer.running_queue:
                 pid = info[0]
                 info[3] = info[3] + 1  # update used_time
-                self.append_resources_history('printer', self.pcb_list[self.current_running].pid)
+                self.append_resources_history(
+                    'printer', self.pcb_list[self.current_running].pid)
                 self.pcb_list[pid].command_queue[self.pcb_list[pid].pc][1] -= 1
                 if self.pcb_list[pid].command_queue[self.pcb_list[pid].pc][1] == 0:
                     p = self.pcb_list[pid].priority
@@ -254,7 +275,8 @@ class ProcessManager:
                         self.ready_queue[p].append(pid)
                     else:
                         self.memory_manager.free(pid)
-                        sys.stdout.write('\033[2K\033[1G')  # avoid \$ [pid #1] finish!
+                        # avoid \$ [pid #1] finish!
+                        sys.stdout.write('\033[2K\033[1G')
                         print("[pid #%d] finish!" % self.pid)
                         self.pcb_list[pid].status = 'terminated'
                     self.release(pid)
@@ -270,10 +292,11 @@ class ProcessManager:
         ys, gantts = [], []
         for i in self.devices:
             x, y, gantt = [], [], []
-            
+
             # remove too old records
-            while len(self.resources_history[i]) > 0 and self.resources_history[i][0][0] < start_time - 4.0:
-                self.resources_history[i] =  self.resources_history[i][1:]
+            while len(
+                    self.resources_history[i]) > 0 and self.resources_history[i][0][0] < start_time - 4.0:
+                self.resources_history[i] = self.resources_history[i][1:]
 
             # calculate
             average_utilization = 0.0
@@ -303,30 +326,42 @@ class ProcessManager:
 
             # idle time at the end
             if len(x) == 0:
-                x, y, gantt = [j for j in range(10)], [0 for j in range(10)], [-1 for j in range(10)]
+                x, y, gantt = [j for j in range(10)], [
+                    0 for j in range(10)], [-1 for j in range(10)]
             else:
-                while x[-1]  < 9:
+                while x[-1] < 9:
                     average_utilization = average_utilization * 0.5
-                    x.append(x[-1]+1)
+                    x.append(x[-1] + 1)
                     y.append(average_utilization)
                     gantt.append(-1)
             ax[0].plot(x, y)
             ys.append(y)
             gantts.append(gantt)
-                
+
         ax[0].legend(self.devices)
-        
+
         assert len(ys[0]) == len(ys[1])
-        sns.heatmap(data=ys, cbar=None, ax=ax[1], yticklabels=['cpu', 'printer'], annot=True, 
-                linewidths=0.5, robust=True, cmap='YlGnBu', vmin = 0, vmax = 1.0)
-        plt.tight_layout()            
+        sns.heatmap(data=ys, cbar=None, ax=ax[1], yticklabels=['cpu', 'printer'], annot=True,
+                    linewidths=0.5, robust=True, cmap='YlGnBu', vmin=0, vmax=1.0)
+        plt.tight_layout()
 
         plt.savefig('cpu_and_printer.jpg')
 
         # draw gantt
         plt.close("all")
         # print(gantts[0])
-        sns.heatmap(data=gantts, yticklabels=['cpu', 'printer'], cbar=None, annot=True, linewidths=0.5, robust=True, cmap='YlGnBu', vmin = -1, vmax = 7)
+        sns.heatmap(
+            data=gantts,
+            yticklabels=[
+                'cpu',
+                'printer'],
+            cbar=None,
+            annot=True,
+            linewidths=0.5,
+            robust=True,
+            cmap='YlGnBu',
+            vmin=-1,
+            vmax=7)
         plt.savefig('process_gantt_graph.jpg')
 
         # print('Figure saved at resource_monitor.png')

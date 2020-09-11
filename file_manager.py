@@ -1,5 +1,4 @@
 # coding=utf-8
-
 import json
 import os
 import copy
@@ -37,7 +36,8 @@ class FileManager:
     root_path = os.getcwd() + file_separator + 'MiniOS_files'  # Win下为\, linux下需要修改!
 
     def __init__(self, block_size=512, tracks=200, secs=12):  # block_size的单位:Byte
-        self.current_working_path = self.file_separator  # 当前工作目录相对路径, 可以与root_path一起构成绝对路径
+        # 当前工作目录相对路径, 可以与root_path一起构成绝对路径
+        self.current_working_path = self.file_separator
 
         self.block_size = block_size
         self.block_number = tracks * secs
@@ -76,7 +76,10 @@ class FileManager:
         elif seek_algo == 'C_LOOK':
             self.disk.C_LOOK(seek_queue)
         else:
-            print("get_file: cannot get file. '" + seek_algo + "' no such disk seek algorithm")
+            print(
+                "get_file: cannot get file. '" +
+                seek_algo +
+                "' no such disk seek algorithm")
 
     def get_file(self, file_path, mode='r', seek_algo='FCFS'):
         # 由于open()能完成绝大多数工作, 该函数的主要功能体现在排除异常:
@@ -111,15 +114,22 @@ class FileManager:
                     elif seek_algo == 'C_LOOK':
                         self.disk.C_LOOK(seek_queue)
                     else:
-                        print("get_file: cannot get file '" + basename + "': '" + seek_algo + "' no such disk seek algorithm")
+                        print("get_file: cannot get file '" + basename +
+                              "': '" + seek_algo + "' no such disk seek algorithm")
                     # 未解决异常! 直接把形参mode丢到open()了.
                     f = open(gf_path, mode)
                     # print("get_file success")
                     return json.load(f)
                 else:
-                    print("get_file: cannot get file'" + basename + "': dir not a common file")
+                    print(
+                        "get_file: cannot get file'" +
+                        basename +
+                        "': dir not a common file")
             else:
-                print("get_file: cannot get file'" + basename + "': file not exist")
+                print(
+                    "get_file: cannot get file'" +
+                    basename +
+                    "': file not exist")
 
         return False
 
@@ -210,7 +220,8 @@ class FileManager:
         free_blocks = sorted(free_blocks, key=lambda k: k[1], reverse=True)
         return free_blocks[0][0]
 
-    def find_free_blocks(self, num, method=0):  # num:需要的blocks数，此函数用于寻找连续的num个free blocks
+    # num:需要的blocks数，此函数用于寻找连续的num个free blocks
+    def find_free_blocks(self, num, method=0):
         goal_str = self.bitmap2str(np.ones(num))
         if method == 0:
             return self.block_first_fit(goal_str)
@@ -229,7 +240,8 @@ class FileManager:
         if first_free_block == -1:  # 没有足够空间存储此文件
             return -1
         free = self.block_size - occupy
-        self.block_dir[fp] = (first_free_block, num + 1, int(f["size"]))  # block分配信息存在dir中
+        self.block_dir[fp] = (first_free_block, num + 1,
+                              int(f["size"]))  # block分配信息存在dir中
         count = int(first_free_block)
         for i in range(num + 1):
             if i == num:  # 最后一块可能有碎片
@@ -313,7 +325,8 @@ class FileManager:
     # command: ls
     # 2020.6.9 陈斌：添加method参数，当其为print，则代表原方法，否则为get，返回file_list
     # method == 'get' 用于实现shell的正则表达式匹配功能
-    def ls(self, dir_path='', mode='', method='print'):  # dir_path为空时,列出当前目录文件; 非空(填相对路径时), 列出目标目录里的文件
+    # dir_path为空时,列出当前目录文件; 非空(填相对路径时), 列出目标目录里的文件
+    def ls(self, dir_path='', mode='', method='print'):
         current_working_dict = self.path2dict(dir_path)
         # 异常1:ls路径出错. 由于path2dict()中已经报错 | 注: 此处偷懒 如果目标存在, 但不是文件夹, 同样报path
         # error
@@ -324,7 +337,12 @@ class FileManager:
             (upper_path, basename) = self.path_split(dir_path)
             if current_working_dict[3] == 'x':
                 if mode == '-l' or mode == '-al':
-                    print(current_working_dict, '\t', '\033[1;32m' + basename + '\033[0m')
+                    print(
+                        current_working_dict,
+                        '\t',
+                        '\033[1;32m' +
+                        basename +
+                        '\033[0m')
                 else:
                     # print('\033[1;32m' + basename + '\033[0m', '\t', end='')
                     print('\033[1;32m' + basename + '\033[0m')
@@ -344,7 +362,10 @@ class FileManager:
             if len(file_list) == 0:
                 return
             if mode not in ('-a', '-l', '-al', ''):
-                print("ls: invalid option'" + mode + "', try '-a' / '-l' / '-al'")
+                print(
+                    "ls: invalid option'" +
+                    mode +
+                    "', try '-a' / '-l' / '-al'")
                 return
             for file in file_list:
                 # 隐藏文件不显示
@@ -359,7 +380,12 @@ class FileManager:
                 # 可执行文件高亮绿色显示
                 elif current_working_dict[file][0] == 'e':
                     if mode == '-l' or mode == '-al':
-                        print(current_working_dict[file], '\t', '\033[1;32m' + file + '\033[0m')
+                        print(
+                            current_working_dict[file],
+                            '\t',
+                            '\033[1;32m' +
+                            file +
+                            '\033[0m')
                     else:
                         print('\033[1;32m' + file + '\033[0m', '\t', end='')
                 else:
@@ -383,13 +409,14 @@ class FileManager:
             # '..'指向上一级
             elif dir_path == '..':
                 self.current_working_path = self.current_working_path.rsplit(self.file_separator, 2)[
-                                                0] + self.file_separator
+                    0] + self.file_separator
             # 参数为"\"(根目录), 由于根目录无上级目录, 无法完成下一个分支中的操作, 故在这个分支中单独操作.
             elif dir_path == os.sep:
                 self.current_working_path = os.sep
             else:
                 try:
-                    if basename == "." or basename == ".." or isinstance(current_working_dict[basename], dict):
+                    if basename == "." or basename == ".." or isinstance(
+                            current_working_dict[basename], dict):
                         # 相对路径
                         if dir_path[0] != self.file_separator:
                             # 警告! 未解决异常: 当路径以数个\结尾时, \不会被无视.
@@ -399,8 +426,9 @@ class FileManager:
                             path_with_point = dir_path + self.file_separator
                         # 消除..和.
                         dir_list = path_with_point.split(self.file_separator)
-                        dir_list = [i for i in dir_list if i != '']  # 去除由\分割出的空值
-                        ptr = 0 #dir_list指针
+                        dir_list = [
+                            i for i in dir_list if i != '']  # 去除由\分割出的空值
+                        ptr = 0  # dir_list指针
                         while ptr < len(dir_list):
                             # .即自身
                             if dir_list[ptr] == '.':
@@ -409,7 +437,7 @@ class FileManager:
                             elif dir_list[ptr] == '..':
                                 if ptr > 0:
                                     dir_list.pop(ptr)
-                                    dir_list.pop(ptr-1)
+                                    dir_list.pop(ptr - 1)
                                     ptr = ptr - 1
                                 # 当已经到根目录时
                                 else:
@@ -430,7 +458,8 @@ class FileManager:
     # command: make dir
     def mkdir(self, dir_path):
         (upper_path, basename) = self.path_split(dir_path)
-        current_working_dict = self.path2dict(upper_path)  # 将获取到的字典直接赋值, 对其修改可以影响到文件树
+        current_working_dict = self.path2dict(
+            upper_path)  # 将获取到的字典直接赋值, 对其修改可以影响到文件树
         # 异常1 路径出错
         if current_working_dict == -1:
             pass
@@ -454,7 +483,10 @@ class FileManager:
     # command: make file
     def mkf(self, file_path, file_type='crwx', size='233', content=None):
         if file_type[0] != 'c':
-            print("mkf: cannot create file'" + file_path + "': only common file can be created")
+            print(
+                "mkf: cannot create file'" +
+                file_path +
+                "': only common file can be created")
             return
         (upper_path, basename) = self.path_split(file_path)
         current_working_dict = self.path2dict(upper_path)
@@ -478,7 +510,10 @@ class FileManager:
                     mkf_path = file_path
                 if self.fill_file_into_blocks(
                         json_text, mkf_path, method=2) == -1:  # 测试是否能装入block
-                    print("mkf: cannot create file'" + basename + "': No enough Space")
+                    print(
+                        "mkf: cannot create file'" +
+                        basename +
+                        "': No enough Space")
                     return
                 mkf_path = self.root_path + mkf_path
                 f = open(mkf_path, 'w')
@@ -513,14 +548,16 @@ class FileManager:
                         # -rf: 递归地强制删除文件夹
                         if len(mode) == 3 and mode[2] == 'f':
                             sub_dir_dict = self.path2dict(file_path)
-                            for i in copy.deepcopy(copy.deepcopy(list(sub_dir_dict.keys()))):  # 删除此目录下的每个文件
+                            for i in copy.deepcopy(
+                                    copy.deepcopy(list(sub_dir_dict.keys()))):  # 删除此目录下的每个文件
                                 sub_file_path = file_path + '\\' + i
                                 real_sub_file_path = rmdir_path + '\\' + i
                                 # 非空的目录, 需要递归删除
                                 # print(sub_dir_dict[i])
                                 # print(type(sub_dir_dict[i]))
                                 # print(isinstance(sub_dir_dict[i], str))
-                                if isinstance(sub_dir_dict[i], dict) and sub_dir_dict[i]:
+                                if isinstance(
+                                        sub_dir_dict[i], dict) and sub_dir_dict[i]:
                                     self.rm(sub_file_path, '-rf')
                                 # 空目录, 直接删除
                                 elif isinstance(sub_dir_dict[i], dict) and not sub_dir_dict[i]:
@@ -587,7 +624,10 @@ class FileManager:
                     print("rm: cannot remove '" + basename +
                           "': Is a dir. Try to use -r option")
             else:
-                print("rm: invalid option'" + mode + "', try '-r' / '-f' / '-rf'")
+                print(
+                    "rm: invalid option'" +
+                    mode +
+                    "', try '-r' / '-f' / '-rf'")
 
     # 更改文件属性, name为所该文件名称, type为四字字符(警告!此处未对此四字符进行错误检测)
     def chmod(self, file_path, file_type):
@@ -653,7 +693,11 @@ class FileManager:
         all_free = len(np.nonzero(self.bitmap)[0])
         all_free *= self.block_size  # 剩余的总字节数
         all_occupy = total - all_free  # 已占用的总字节数
-        print("total: {0} B,\t allocated: {1} B,\t free: {2} B\n".format(total, all_occupy, all_free))
+        print(
+            "total: {0} B,\t allocated: {1} B,\t free: {2} B\n".format(
+                total,
+                all_occupy,
+                all_free))
         # for fp, item in self.block_dir.items():  # 调试用
         #     print("{:<10}: start {}\t length {}".format(fp, item[0], item[1]))
         for i in range(self.block_number):
@@ -661,7 +705,8 @@ class FileManager:
             occupy = self.block_size - b.get_free_space()
             if occupy > 0:
                 # all_free += b.get_free_space()
-                print("block #{:<5} {:>5} / {} Byte(s)   {:<20}".format(i, occupy, self.block_size, str(b.get_fp())))
+                print("block #{:<5} {:>5} / {} Byte(s)   {:<20}".format(i,
+                                                                        occupy, self.block_size, str(b.get_fp())))
 
     # nowheadpointer 某次访存开始时磁头所在磁道号.
     def set_disk_now_headpointer(self, now_headpointer=0):
@@ -676,7 +721,8 @@ class FileManager:
 
 
 class Disk:
-    def __init__(self, block_size, track_num, sec_num, now_headpointer=53, x_slow=10):
+    def __init__(self, block_size, track_num, sec_num,
+                 now_headpointer=53, x_slow=10):
         # 扇区大小 默认512byte
         self.sector_size = block_size
         # 每磁道中扇区数 默认12
@@ -733,7 +779,8 @@ class Disk:
             # 寻道:模拟延迟并移动磁头
             time.sleep(track_distance * self.seek_speed)
             # 记录耗时(考虑减速比)
-            this_time_time = this_time_time + (track_distance * self.seek_speed) / self.x_slow
+            this_time_time = this_time_time + \
+                (track_distance * self.seek_speed) / self.x_slow
             # print("seek track:", seek_addr[0])
             self.now_headpointer = seek_addr[0]
 
@@ -749,7 +796,8 @@ class Disk:
             this_time_byte = this_time_byte + self.sector_size
         self.total_time = self.total_time + this_time_time
         self.total_byte = self.total_byte + this_time_byte
-        print("disk access success: time used: ", round(this_time_time * 1000, 5), "ms")
+        print("disk access success: time used: ",
+              round(this_time_time * 1000, 5), "ms")
         # print(total_track_distance)
         self.total_speed_list.append(self.total_byte / self.total_time)
         self.speed_list.append(this_time_byte / this_time_time)

@@ -12,7 +12,7 @@ class Shell:
         self.block_flag = False
         self.clear_cmd_str = 'cls' if platform.system() == 'Windows' else 'clear'
         self.print_system_info()
-               
+
     def print_system_info(self):
         os.system(self.clear_cmd_str)
         print('MiniOS 1.0', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
@@ -21,7 +21,7 @@ class Shell:
     def get_split_command(self, cwd, file_list):
         try:
             commands = input(cwd + '$ ').split(';')
-        except:
+        except BaseException:
             commands = []
         for i in range(len(commands)):
             raw_command = commands[i].split()
